@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Siege Helper</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #020617;
+        color: #e5e7eb;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; background: #020617; }
+      a { color: inherit; text-decoration: none; }
+      button, input, select, textarea { font: inherit; }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid rgba(187, 147, 72, 0.32);
+        background: rgba(9, 13, 22, 0.94);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.26);
+      }
+
+      .topbar-inner {
+        display: flex;
+        height: 64px;
+        max-width: 860px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #f4d38a;
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 28px;
+        height: 28px;
+        place-items: center;
+        border: 1px solid rgba(244, 211, 138, 0.38);
+        border-radius: 7px;
+        background: linear-gradient(145deg, rgba(216, 173, 95, 0.28), rgba(78, 167, 216, 0.18));
+      }
+
+      .nav { display: flex; align-items: center; gap: 8px; }
+
+      .nav a,
+      .button,
+      .theme-toggle {
+        display: inline-flex;
+        min-height: 40px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        color: #cbd5e1;
+        cursor: pointer;
+        padding: 0 14px;
+      }
+
+      .nav a:hover,
+      .button:hover {
+        background: rgba(216, 173, 95, 0.12);
+        color: #fff7df;
+      }
+
+      .theme-toggle {
+        min-height: 34px;
+        border-color: rgba(244, 211, 138, 0.36);
+        background: rgba(216, 173, 95, 0.1);
+        color: #f4d38a;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .button.primary {
+        width: 100%;
+        border-color: rgba(244, 211, 138, 0.42);
+        background: linear-gradient(180deg, #b98535, #7e5523);
+        color: #fff;
+        box-shadow: 0 12px 28px rgba(126, 85, 35, 0.28);
+      }
+
+      .button.outline {
+        border-color: rgba(187, 147, 72, 0.32);
+        color: #f3d99e;
+      }
+
+      .button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 28px 16px 36px;
+      }
+
+      .card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(102, 125, 154, 0.34);
+        border-radius: 8px;
+        background: linear-gradient(180deg, rgba(33, 42, 60, 0.92), rgba(24, 31, 45, 0.78));
+        padding: 24px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 45px rgba(0, 0, 0, 0.22);
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 18% 0%, rgba(216, 173, 95, 0.16), transparent 34%),
+          radial-gradient(circle at 92% 2%, rgba(78, 167, 216, 0.13), transparent 32%);
+      }
+
+      .card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      h1 {
+        margin: 0 0 20px;
+        border-bottom: 1px solid rgba(187, 147, 72, 0.18);
+        padding-bottom: 16px;
+        color: #fff3cf;
+        font-size: 30px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 7px;
+        color: #ead29b;
+        font-size: 14px;
+      }
+
+      .field { margin-bottom: 18px; }
+      .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid rgba(102, 125, 154, 0.44);
+        border-radius: 8px;
+        background: rgba(7, 10, 18, 0.58);
+        color: #f8fafc;
+        outline: none;
+        padding: 0 12px;
+      }
+
+      textarea {
+        min-height: 86px;
+        padding: 10px 12px;
+        resize: vertical;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #d8ad5f;
+        box-shadow: 0 0 0 3px rgba(216, 173, 95, 0.18);
+      }
+
+      .hint,
+      .message {
+        margin-top: 5px;
+        color: #94a3b8;
+        font-size: 12px;
+      }
+
+      .monster-search { position: relative; }
+
+      .monster-results,
+      .monster-empty {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 6px);
+        z-index: 30;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        background: #1e293b;
+        box-shadow: 0 18px 45px rgba(2, 6, 23, 0.4);
+      }
+
+      .monster-results {
+        display: grid;
+        max-height: 260px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        overflow-y: auto;
+        padding: 8px;
+      }
+
+      .monster-empty {
+        padding: 12px;
+        color: #94a3b8;
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .monster-option {
+        display: grid;
+        min-width: 0;
+        grid-template-columns: 40px 1fr;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #475569;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.62);
+        color: #f8fafc;
+        padding: 6px;
+        text-align: left;
+      }
+
+      .monster-option:hover {
+        border-color: rgba(244, 211, 138, 0.64);
+        background: rgba(216, 173, 95, 0.1);
+      }
+
+      .monster-option img {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        object-fit: cover;
+      }
+
+      .selected-monster {
+        display: grid;
+        grid-template-columns: 52px 1fr auto;
+        align-items: center;
+        gap: 10px;
+        min-height: 64px;
+        border: 1px solid rgba(102, 125, 154, 0.34);
+        border-radius: 8px;
+        background: linear-gradient(180deg, rgba(33, 42, 60, 0.86), rgba(7, 10, 18, 0.46));
+        padding: 8px;
+      }
+
+      .selected-monster img,
+      .selected-monster-fallback {
+        width: 52px;
+        height: 52px;
+        border: 1px solid rgba(244, 211, 138, 0.16);
+        border-radius: 999px;
+        object-fit: cover;
+      }
+
+      .selected-monster-fallback {
+        display: grid;
+        place-items: center;
+        background: linear-gradient(145deg, #202b3f, #111827);
+        color: #94a3b8;
+        font-weight: 800;
+      }
+
+      .selected-monster-name {
+        overflow: hidden;
+        color: #fff3cf;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .icon-button {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: #94a3b8;
+        cursor: pointer;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      @media (max-width: 680px) {
+        .nav { display: none; }
+        .grid { grid-template-columns: 1fr; }
+        .actions { flex-direction: column; }
+        .button { width: 100%; }
+      }
+    </style>
+    <link rel="stylesheet" href="/theme.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="/dashboard">
+          <span class="brand-mark">S</span>
+          <span>Siege Helper</span>
+        </a>
+        <nav class="nav">
+          <a href="/dashboard">Home</a>
+          <a href="/defenses/new">Nova Defesa</a>
+          <a href="/attacks/new">Novo Ataque</a>
+          <button class="theme-toggle" id="themeToggle" type="button">Light</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <a class="button outline" href="/dashboard">Voltar</a>
+      <section class="card" style="margin-top: 16px;">
+        <h1 id="formTitle">Nova Defesa</h1>
+        <form id="defenseForm">
+          <div class="field">
+            <label for="nameInput">Nome da Defesa</label>
+            <input id="nameInput" placeholder="Ex: Lamiella / ROBO-E65 / Velaska" />
+            <div class="hint">Deixe vazio para gerar automaticamente com os monstros.</div>
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <label for="monster1">Monstro 1</label>
+              <div class="monster-search">
+                <div id="monster1Selected"></div>
+                <input id="monster1" autocomplete="off" placeholder="Buscar monstro..." required />
+                <div id="monster1Results"></div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="monster2">Monstro 2</label>
+              <div class="monster-search">
+                <div id="monster2Selected"></div>
+                <input id="monster2" autocomplete="off" placeholder="Buscar monstro..." required />
+                <div id="monster2Results"></div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="monster3">Monstro 3</label>
+              <div class="monster-search">
+                <div id="monster3Selected"></div>
+                <input id="monster3" autocomplete="off" placeholder="Buscar monstro..." required />
+                <div id="monster3Results"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <label for="tower">Torre</label>
+              <select id="tower">
+                <option value="4star">4★</option>
+                <option value="5star">5★</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="defenseType">Tipo</label>
+              <select id="defenseType">
+                <option value="bruiser">Bruiser</option>
+                <option value="cleave">Cleave</option>
+                <option value="sustain">Sustain</option>
+                <option value="control">Controle</option>
+                <option value="speed_contest">Speed Contest</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="difficulty">Dificuldade</label>
+              <select id="difficulty">
+                <option value="medium">Média</option>
+                <option value="easy">Fácil</option>
+                <option value="hard">Difícil</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <label for="status">Status</label>
+              <select id="status">
+                <option value="active">Ativa</option>
+                <option value="inactive">Inativa</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="season">Season</label>
+              <select id="season"></select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="observations">Observações</label>
+            <textarea id="observations" placeholder="Notas sobre variações, riscos ou contexto da defesa..."></textarea>
+          </div>
+
+          <button class="button primary" id="saveButton" type="submit">Cadastrar Defesa</button>
+        </form>
+      </section>
+      <div class="message" id="message" hidden></div>
+    </main>
+
+    <script>
+      function setupThemeToggle() {
+        const key = "siege-helper-theme";
+        const button = document.getElementById("themeToggle");
+        const applyTheme = (theme) => {
+          document.documentElement.dataset.theme = theme;
+          if (button) button.textContent = theme === "light" ? "Dark" : "Light";
+        };
+        applyTheme(localStorage.getItem(key) || "dark");
+        if (button) {
+          button.addEventListener("click", () => {
+            const nextTheme = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+            localStorage.setItem(key, nextTheme);
+            applyTheme(nextTheme);
+          });
+        }
+      }
+      setupThemeToggle();
+
+      const IMG_BASE = "https://swarfarm.com/static/herders/images/monsters/";
+      const defenseId = location.pathname.match(/\/defenses\/(\d+)\/edit/)?.[1] || "";
+      const isEditMode = Boolean(defenseId);
+      const selectedMonsters = { monster1: null, monster2: null, monster3: null };
+      const searchTimers = new Map();
+      const message = document.getElementById("message");
+      const saveButton = document.getElementById("saveButton");
+
+      if (isEditMode) {
+        document.getElementById("formTitle").textContent = "Editar Defesa";
+        saveButton.textContent = "Salvar Alterações";
+      }
+
+      for (let season = 25; season >= 1; season -= 1) {
+        const option = document.createElement("option");
+        option.value = `Season ${season}`;
+        option.textContent = `Season ${season}`;
+        document.getElementById("season").appendChild(option);
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function value(id) {
+        return document.getElementById(id).value.trim();
+      }
+
+      function setValue(id, nextValue) {
+        document.getElementById(id).value = nextValue || "";
+      }
+
+      function showMessage(text, isError = false) {
+        message.hidden = false;
+        message.textContent = text;
+        message.style.color = isError ? "#f87171" : "#94a3b8";
+      }
+
+      function generatedName() {
+        return [value("monster1"), value("monster2"), value("monster3")].filter(Boolean).join(" / ");
+      }
+
+      function setGeneratedNameIfBlank() {
+        const input = document.getElementById("nameInput");
+        if (!input.value.trim()) input.value = generatedName();
+      }
+
+      function closeMonsterResults(id) {
+        const box = document.getElementById(`${id}Results`);
+        box.className = "";
+        box.innerHTML = "";
+      }
+
+      function closeAllMonsterResults(exceptId = "") {
+        ["monster1", "monster2", "monster3"].forEach((id) => {
+          if (id !== exceptId) closeMonsterResults(id);
+        });
+      }
+
+      function renderSelectedMonster(id) {
+        const input = document.getElementById(id);
+        const box = document.getElementById(`${id}Selected`);
+        const selected = selectedMonsters[id];
+        if (!selected) {
+          box.innerHTML = "";
+          input.hidden = false;
+          return;
+        }
+        input.hidden = true;
+        box.innerHTML = `
+          <div class="selected-monster">
+            ${selected.image_filename
+              ? `<img src="${IMG_BASE}${escapeHtml(selected.image_filename)}" alt="${escapeHtml(selected.name)}" loading="lazy" />`
+              : `<span class="selected-monster-fallback">${escapeHtml(selected.name.slice(0, 1))}</span>`}
+            <div class="selected-monster-name" title="${escapeHtml(selected.name)}">${escapeHtml(selected.name)}</div>
+            <button class="icon-button" type="button" data-clear-monster="${id}" aria-label="Trocar monstro">×</button>
+          </div>
+        `;
+      }
+
+      function selectMonster(id, monster) {
+        selectedMonsters[id] = monster;
+        const input = document.getElementById(id);
+        input.value = monster.name;
+        input.dataset.element = monster.element || "fire";
+        closeMonsterResults(id);
+        renderSelectedMonster(id);
+        setGeneratedNameIfBlank();
+      }
+
+      function clearSelectedMonster(id) {
+        selectedMonsters[id] = null;
+        const input = document.getElementById(id);
+        input.value = "";
+        input.dataset.element = "";
+        renderSelectedMonster(id);
+        closeMonsterResults(id);
+      }
+
+      function renderMonsterResults(id, monsters) {
+        const box = document.getElementById(`${id}Results`);
+        if (!monsters.length) {
+          box.className = "monster-empty";
+          box.textContent = "Nenhum monstro encontrado";
+          return;
+        }
+        box.className = "monster-results";
+        box.innerHTML = monsters.map((monster) => `
+          <button
+            class="monster-option"
+            type="button"
+            data-monster-input="${id}"
+            data-monster-id="${escapeHtml(monster.id)}"
+            data-monster-name="${escapeHtml(monster.name)}"
+            data-monster-image="${escapeHtml(monster.image_filename || "")}"
+            data-monster-element="${escapeHtml(monster.element || "fire")}"
+          >
+            ${monster.image_filename
+              ? `<img src="${IMG_BASE}${escapeHtml(monster.image_filename)}" alt="${escapeHtml(monster.name)}" loading="lazy" />`
+              : `<span>${escapeHtml(monster.name.slice(0, 1))}</span>`}
+            <span title="${escapeHtml(monster.name)}">${escapeHtml(monster.name)}</span>
+          </button>
+        `).join("");
+      }
+
+      async function searchMonsters(id, queryText) {
+        const box = document.getElementById(`${id}Results`);
+        if (queryText.trim().length < 2) {
+          box.className = "monster-empty";
+          box.textContent = "Digite pelo menos 2 letras";
+          return;
+        }
+        box.className = "monster-empty";
+        box.textContent = "Buscando...";
+        try {
+          const query = new URLSearchParams({ name: queryText.trim(), page_size: "50" });
+          const response = await fetch(`/api/monster-search?${query}`);
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || "Erro ao buscar monstro");
+          renderMonsterResults(id, data.results || []);
+        } catch (error) {
+          box.className = "monster-empty";
+          box.textContent = error.message || "Erro ao buscar monstro";
+        }
+      }
+
+      async function findMonsterByName(name) {
+        try {
+          const query = new URLSearchParams({ name, page_size: "10" });
+          const response = await fetch(`/api/monster-search?${query}`);
+          if (!response.ok) throw new Error("Erro ao buscar monstro");
+          const data = await response.json();
+          return (data.results || []).find((item) => item.name?.toLowerCase() === name.toLowerCase())
+            || (data.results || [])[0]
+            || { name, image_filename: "", element: "fire" };
+        } catch {
+          return { name, image_filename: "", element: "fire" };
+        }
+      }
+
+      async function setSelectedMonsterFromName(id, name, element) {
+        if (!name) return;
+        const monster = await findMonsterByName(name);
+        selectMonster(id, {
+          id: monster.id || "",
+          name,
+          image_filename: monster.image_filename || "",
+          element: element || monster.element || "fire",
+        });
+      }
+
+      async function loadDefenseForEdit() {
+        if (!isEditMode) return;
+        try {
+          const response = await fetch(`/api/defense-detail?id=${encodeURIComponent(defenseId)}`);
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || "Erro ao carregar defesa");
+          const defense = data.defense;
+          setValue("nameInput", defense.name);
+          setValue("tower", defense.tower);
+          setValue("defenseType", defense.defense_type);
+          setValue("difficulty", defense.difficulty);
+          setValue("status", defense.status);
+          setValue("season", defense.season || "Season 25");
+          setValue("observations", defense.observations);
+          await Promise.all([
+            setSelectedMonsterFromName("monster1", defense.monster1, defense.element1),
+            setSelectedMonsterFromName("monster2", defense.monster2, defense.element2),
+            setSelectedMonsterFromName("monster3", defense.monster3, defense.element3),
+          ]);
+        } catch (error) {
+          showMessage(error.message || "Erro ao carregar defesa.", true);
+        }
+      }
+
+      ["monster1", "monster2", "monster3"].forEach((id) => {
+        const input = document.getElementById(id);
+        input.addEventListener("input", () => {
+          closeAllMonsterResults(id);
+          clearTimeout(searchTimers.get(id));
+          searchTimers.set(id, setTimeout(() => searchMonsters(id, input.value), 250));
+        });
+        input.addEventListener("focus", () => {
+          closeAllMonsterResults(id);
+          if (input.value.trim()) searchMonsters(id, input.value);
+        });
+      });
+
+      document.addEventListener("click", (event) => {
+        const option = event.target.closest("[data-monster-input]");
+        if (option) {
+          selectMonster(option.dataset.monsterInput, {
+            id: option.dataset.monsterId,
+            name: option.dataset.monsterName,
+            image_filename: option.dataset.monsterImage,
+            element: option.dataset.monsterElement,
+          });
+          return;
+        }
+        const clearButton = event.target.closest("[data-clear-monster]");
+        if (clearButton) {
+          clearSelectedMonster(clearButton.dataset.clearMonster);
+          document.getElementById(clearButton.dataset.clearMonster).focus();
+          return;
+        }
+        if (!event.target.closest(".monster-search")) closeAllMonsterResults();
+      });
+
+      document.getElementById("defenseForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const payload = {
+          name: value("nameInput") || generatedName(),
+          monster1: value("monster1"),
+          monster2: value("monster2"),
+          monster3: value("monster3"),
+          element1: document.getElementById("monster1").dataset.element || "fire",
+          element2: document.getElementById("monster2").dataset.element || "fire",
+          element3: document.getElementById("monster3").dataset.element || "fire",
+          tower: value("tower"),
+          defense_type: value("defenseType"),
+          difficulty: value("difficulty"),
+          observations: value("observations"),
+          status: value("status"),
+          season: value("season"),
+        };
+
+        saveButton.disabled = true;
+        saveButton.textContent = "Salvando...";
+        try {
+          const response = await fetch(isEditMode ? `/api/defenses/${defenseId}` : "/api/defenses", {
+            method: isEditMode ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || "Erro ao salvar defesa");
+          location.href = `/defenses/${data.id}`;
+        } catch (error) {
+          showMessage(error.message || "Erro ao salvar defesa.", true);
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = isEditMode ? "Salvar Alterações" : "Cadastrar Defesa";
+        }
+      });
+
+      loadDefenseForEdit();
+    </script>
+  </body>
+</html>

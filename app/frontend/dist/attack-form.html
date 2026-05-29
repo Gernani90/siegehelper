@@ -1,0 +1,1499 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Siege Helper</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #020617;
+        color: #e5e7eb;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; background: #020617; }
+      a { color: inherit; text-decoration: none; }
+      button, input, select, textarea { font: inherit; }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid rgba(51, 65, 85, 0.7);
+        background: rgba(15, 23, 42, 0.96);
+        backdrop-filter: blur(12px);
+      }
+
+      .topbar-inner {
+        display: flex;
+        height: 64px;
+        max-width: 768px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 28px;
+        height: 28px;
+        place-items: center;
+        border-radius: 7px;
+        background: rgba(99, 102, 241, 0.22);
+        color: #a5b4fc;
+      }
+
+      .nav { display: flex; align-items: center; gap: 8px; }
+
+      .nav a,
+      .button {
+        display: inline-flex;
+        min-height: 40px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        padding: 0 14px;
+        background: transparent;
+        color: #cbd5e1;
+        cursor: pointer;
+      }
+
+      .nav a:hover,
+      .button:hover { background: rgba(30, 41, 59, 0.8); color: #fff; }
+      .button.primary { width: 100%; background: #4f46e5; color: #fff; }
+      .button.primary:hover { background: #4338ca; }
+      .button.outline { border-color: #475569; }
+      .button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+      main {
+        max-width: 768px;
+        margin: 0 auto;
+        padding: 24px 16px 36px;
+      }
+
+      .card {
+        border: 1px solid rgba(51, 65, 85, 0.7);
+        border-radius: 8px;
+        background: rgba(30, 41, 59, 0.55);
+        padding: 22px;
+      }
+
+      h1 { margin: 0 0 20px; font-size: 24px; }
+      label { display: block; margin-bottom: 7px; color: #cbd5e1; font-size: 14px; }
+
+      .field { margin-bottom: 18px; }
+      .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid #475569;
+        border-radius: 8px;
+        background: rgba(51, 65, 85, 0.52);
+        color: #f8fafc;
+        outline: none;
+        padding: 0 12px;
+      }
+
+      textarea {
+        min-height: 76px;
+        padding: 10px 12px;
+        resize: vertical;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+      }
+
+      .hint { margin-top: 5px; color: #64748b; font-size: 12px; }
+      .loading, .message { display: grid; min-height: 220px; place-items: center; color: #94a3b8; }
+
+      .focus-picker {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .focus-target {
+        position: relative;
+        min-width: 0;
+        border: 1px solid #475569;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.62);
+        padding: 12px;
+        color: #f8fafc;
+        text-align: center;
+      }
+
+      .focus-target:hover {
+        border-color: rgba(99, 102, 241, 0.75);
+        background: rgba(30, 41, 59, 0.82);
+      }
+
+      .focus-target.selected {
+        border-color: #22c55e;
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+      }
+
+      .focus-rank {
+        position: absolute;
+        right: 8px;
+        top: 8px;
+        display: grid;
+        width: 28px;
+        height: 28px;
+        place-items: center;
+        border-radius: 999px;
+        background: #22c55e;
+        color: #052e16;
+        font-weight: 800;
+      }
+
+      .focus-portrait {
+        display: grid;
+        width: 72px;
+        height: 72px;
+        place-items: center;
+        overflow: hidden;
+        margin: 0 auto 9px;
+        border-radius: 9px;
+        background: #334155;
+        color: #94a3b8;
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      .focus-portrait img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .focus-name {
+        overflow: hidden;
+        font-size: 13px;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .inline-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .monster-search {
+        position: relative;
+      }
+
+      .monster-results {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 6px);
+        z-index: 30;
+        display: grid;
+        max-height: 260px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        overflow-y: auto;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        background: #1e293b;
+        padding: 8px;
+        box-shadow: 0 18px 45px rgba(2, 6, 23, 0.4);
+      }
+
+      .monster-option {
+        display: grid;
+        min-width: 0;
+        grid-template-columns: 40px 1fr;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #475569;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.62);
+        padding: 6px;
+        color: #f8fafc;
+        text-align: left;
+      }
+
+      .monster-option:hover {
+        border-color: rgba(99, 102, 241, 0.8);
+        background: rgba(51, 65, 85, 0.75);
+      }
+
+      .monster-option img {
+        width: 40px;
+        height: 40px;
+        border-radius: 7px;
+        object-fit: cover;
+      }
+
+      .monster-option span {
+        overflow: hidden;
+        font-size: 12px;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .monster-empty {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 6px);
+        z-index: 30;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        background: #1e293b;
+        padding: 12px;
+        color: #94a3b8;
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .selected-monster {
+        display: grid;
+        grid-template-columns: 52px 1fr auto;
+        align-items: center;
+        gap: 10px;
+        min-height: 64px;
+        border: 1px solid #475569;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.68);
+        padding: 8px;
+        cursor: pointer;
+      }
+
+      .selected-monster.active {
+        border-color: #22c55e;
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.14);
+      }
+
+      .selected-monster img,
+      .selected-monster-fallback {
+        width: 52px;
+        height: 52px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+
+      .selected-monster-fallback {
+        display: grid;
+        place-items: center;
+        background: #334155;
+        color: #94a3b8;
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      .selected-monster-name {
+        overflow: hidden;
+        color: #f8fafc;
+        font-size: 14px;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .icon-button {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: #94a3b8;
+        cursor: pointer;
+      }
+
+      .icon-button:hover {
+        background: rgba(51, 65, 85, 0.8);
+        color: #fff;
+      }
+
+      .monster-builds {
+        display: grid;
+        gap: 14px;
+        margin: 8px 0 18px;
+      }
+
+      .monster-build {
+        border: 1px solid #334155;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.52);
+        padding: 12px;
+      }
+
+      .monster-build-preview {
+        text-align: center;
+      }
+
+      .monster-build-preview img,
+      .monster-build-fallback {
+        width: 56px;
+        height: 56px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+
+      .monster-build-fallback {
+        display: grid;
+        place-items: center;
+        margin: 0 auto;
+        background: #334155;
+        color: #94a3b8;
+        font-weight: 800;
+      }
+
+      .build-panel-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .monster-build-name {
+        overflow: hidden;
+        color: #f8fafc;
+        font-size: 15px;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .monster-build-fields {
+        display: grid;
+        gap: 14px;
+      }
+
+      .build-label {
+        margin-bottom: 8px;
+        color: #cbd5e1;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .rune-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .rune-chip {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        align-items: center;
+        gap: 8px;
+        min-height: 40px;
+        border: 1px solid #475569;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.58);
+        color: #cbd5e1;
+        padding: 6px 8px;
+        text-align: left;
+      }
+
+      .rune-chip:hover {
+        border-color: rgba(99, 102, 241, 0.8);
+        background: rgba(51, 65, 85, 0.72);
+      }
+
+      .rune-chip.selected {
+        border-color: rgba(34, 197, 94, 0.75);
+        background: rgba(22, 101, 52, 0.24);
+        color: #f8fafc;
+      }
+
+      .rune-icon {
+        display: grid;
+        width: 28px;
+        height: 28px;
+        place-items: center;
+        border-radius: 8px;
+        background: var(--rune-color, #475569);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 900;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+      }
+
+      .rune-name {
+        overflow: hidden;
+        font-size: 12px;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .stat-input {
+        display: grid;
+        gap: 5px;
+      }
+
+      .stat-input label {
+        margin: 0;
+        color: #94a3b8;
+        font-size: 12px;
+      }
+
+      .stat-input input {
+        min-height: 36px;
+        padding: 0 9px;
+      }
+
+      @media (max-width: 680px) {
+        .nav { display: none; }
+        .grid { grid-template-columns: 1fr; }
+        .focus-picker { grid-template-columns: 1fr; }
+        .rune-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .button { width: 100%; }
+      }
+
+      :root {
+        --sw-bg: #090d16;
+        --sw-panel: rgba(24, 31, 45, 0.78);
+        --sw-panel-strong: rgba(33, 42, 60, 0.92);
+        --sw-border: rgba(187, 147, 72, 0.32);
+        --sw-border-soft: rgba(102, 125, 154, 0.34);
+        --sw-gold: #d8ad5f;
+        --sw-gold-bright: #f4d38a;
+        --sw-blue: #4ea7d8;
+        --sw-crimson: #c85f5f;
+        --sw-ink: #070a12;
+      }
+
+      body {
+        background:
+          linear-gradient(135deg, rgba(8, 11, 18, 0.98), rgba(13, 21, 33, 0.98) 46%, rgba(31, 26, 20, 0.98)),
+          repeating-linear-gradient(45deg, rgba(244, 211, 138, 0.035) 0 1px, transparent 1px 18px);
+      }
+
+      .topbar {
+        border-bottom-color: var(--sw-border);
+        background: rgba(9, 13, 22, 0.94);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.26);
+      }
+
+      .brand {
+        color: var(--sw-gold-bright);
+      }
+
+      .brand-mark {
+        border: 1px solid rgba(244, 211, 138, 0.38);
+        background: linear-gradient(145deg, rgba(216, 173, 95, 0.28), rgba(78, 167, 216, 0.18));
+        color: var(--sw-gold-bright);
+      }
+
+      .nav a:hover,
+      .button:hover {
+        background: rgba(216, 173, 95, 0.12);
+        color: #fff7df;
+      }
+
+      .button.primary {
+        border-color: rgba(244, 211, 138, 0.42);
+        background: linear-gradient(180deg, #b98535, #7e5523);
+        box-shadow: 0 12px 28px rgba(126, 85, 35, 0.28);
+      }
+
+      .button.primary:hover {
+        background: linear-gradient(180deg, #d09a45, #8e6129);
+      }
+
+      .button.outline {
+        border-color: var(--sw-border);
+        color: #f3d99e;
+      }
+
+      .card,
+      .monster-build,
+      .selected-monster,
+      .focus-target {
+        border-color: var(--sw-border-soft);
+        background: linear-gradient(180deg, var(--sw-panel-strong), var(--sw-panel));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 45px rgba(0, 0, 0, 0.22);
+      }
+
+      .selected-monster.active,
+      .focus-target.selected {
+        border-color: rgba(244, 211, 138, 0.78);
+        box-shadow: 0 0 0 2px rgba(244, 211, 138, 0.16), 0 18px 45px rgba(0, 0, 0, 0.24);
+      }
+
+      h1,
+      .monster-build-name,
+      .selected-monster-name {
+        color: #fff3cf;
+      }
+
+      label,
+      .build-label {
+        color: #ead29b;
+      }
+
+      input,
+      select,
+      textarea {
+        border-color: rgba(102, 125, 154, 0.44);
+        background: rgba(7, 10, 18, 0.58);
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--sw-gold);
+        box-shadow: 0 0 0 3px rgba(216, 173, 95, 0.18);
+      }
+
+      .rune-chip {
+        border-color: rgba(102, 125, 154, 0.48);
+        background: rgba(7, 10, 18, 0.48);
+      }
+
+      .rune-chip:hover {
+        border-color: rgba(244, 211, 138, 0.64);
+        background: rgba(216, 173, 95, 0.1);
+      }
+
+      .rune-chip.selected {
+        border-color: rgba(244, 211, 138, 0.86);
+        background: rgba(142, 97, 41, 0.28);
+      }
+
+      .portrait,
+      .focus-portrait,
+      .monster-build-fallback,
+      .selected-monster-fallback {
+        background: linear-gradient(145deg, #202b3f, #111827);
+        box-shadow: inset 0 0 0 1px rgba(244, 211, 138, 0.12);
+      }
+
+      main {
+        padding-top: 28px;
+      }
+
+      .card {
+        position: relative;
+        overflow: hidden;
+        padding: 24px;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 18% 0%, rgba(216, 173, 95, 0.16), transparent 34%),
+          radial-gradient(circle at 92% 2%, rgba(78, 167, 216, 0.13), transparent 32%);
+      }
+
+      .card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      h1 {
+        border-bottom: 1px solid rgba(187, 147, 72, 0.18);
+        padding-bottom: 16px;
+        font-size: 30px;
+      }
+
+      .grid {
+        gap: 16px;
+      }
+
+      .selected-monster,
+      .focus-target {
+        background:
+          linear-gradient(180deg, rgba(33, 42, 60, 0.86), rgba(7, 10, 18, 0.46));
+      }
+
+      .selected-monster img,
+      .selected-monster-fallback,
+      .focus-portrait {
+        border: 1px solid rgba(244, 211, 138, 0.16);
+        border-radius: 999px;
+      }
+
+      .monster-build {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .monster-build::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(90deg, rgba(216, 173, 95, 0.08), transparent 42%, rgba(78, 167, 216, 0.07));
+      }
+
+      .monster-build > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .rune-chip {
+        min-height: 44px;
+      }
+    </style>
+    <link rel="stylesheet" href="/theme.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="/dashboard">
+          <span class="brand-mark">S</span>
+          <span>Siege Helper</span>
+        </a>
+        <nav class="nav">
+          <a href="/dashboard">Home</a>
+          <a href="/defenses/new">Nova Defesa</a>
+          <a href="/attacks/new">Novo Ataque</a>
+          <button class="theme-toggle" id="themeToggle" type="button">Light</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <a class="button outline" href="javascript:history.back()">Voltar</a>
+      <section class="card" style="margin-top: 16px;">
+        <h1 id="formTitle">Novo Ataque</h1>
+        <form id="attackForm">
+          <div class="field">
+            <label for="defenseSelect">Defesa Alvo</label>
+            <select id="defenseSelect" required>
+              <option value="">Carregando defesas...</option>
+            </select>
+          </div>
+
+          <div class="field" id="focusPickerField" hidden>
+            <label>Ordem de Foco da Defesa</label>
+            <div class="focus-picker" id="focusPicker"></div>
+            <div class="inline-actions">
+              <button class="button outline" id="clearFocusButton" type="button">Limpar foco</button>
+            </div>
+            <div class="hint">Clique nos alvos na ordem desejada: 1, 2 e 3.</div>
+          </div>
+
+          <div class="field">
+            <label for="nameInput">Nome do Ataque</label>
+            <input id="nameInput" placeholder="Ex: Tractor / Lulu / Windy" />
+            <div class="hint">Deixe vazio para gerar automaticamente.</div>
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <label for="monster1">Monstro 1</label>
+              <div class="monster-search">
+                <div id="monster1Selected"></div>
+                <input id="monster1" autocomplete="off" placeholder="Buscar monstro..." required />
+                <div id="monster1Results"></div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="monster2">Monstro 2</label>
+              <div class="monster-search">
+                <div id="monster2Selected"></div>
+                <input id="monster2" autocomplete="off" placeholder="Buscar monstro..." required />
+                <div id="monster2Results"></div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="monster3">Monstro 3</label>
+              <div class="monster-search">
+                <div id="monster3Selected"></div>
+                <input id="monster3" autocomplete="off" placeholder="Buscar monstro..." required />
+                <div id="monster3Results"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field" id="monsterBuildsField" hidden>
+            <div class="monster-builds" id="monsterBuilds"></div>
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <label for="attackType">Tipo</label>
+              <select id="attackType">
+                <option value="safe">Safe</option>
+                <option value="bruiser">Bruiser</option>
+                <option value="cleave">Cleave</option>
+                <option value="tank">Tank</option>
+                <option value="counter">Counter</option>
+                <option value="speed_contest">Speed Contest</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="successRate">Taxa de Sucesso</label>
+              <select id="successRate">
+                <option value="medium">Média</option>
+                <option value="high">Alta</option>
+                <option value="low">Baixa</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="recommendation">Recomendação</label>
+              <select id="recommendation">
+                <option value="recommended">Recomendado</option>
+                <option value="situational">Situacional</option>
+                <option value="not_recommended">Não Recomendado</option>
+              </select>
+            </div>
+          </div>
+
+          <textarea id="focusOrder" hidden></textarea>
+
+          <div class="field">
+            <label for="tips">Dicas</label>
+            <textarea id="tips" placeholder="Dicas para executar o ataque..."></textarea>
+          </div>
+
+          <div class="field">
+            <label for="risks">Riscos</label>
+            <textarea id="risks" placeholder="Riscos e situações perigosas..."></textarea>
+          </div>
+
+          <div class="field">
+            <label for="requirements">Requisitos Mínimos</label>
+            <textarea id="requirements" placeholder="Velocidade, runas, artefatos necessários..."></textarea>
+          </div>
+
+          <div class="field">
+            <label for="season">Season</label>
+            <select id="season"></select>
+          </div>
+
+          <div class="field">
+            <label for="observations">Observações</label>
+            <textarea id="observations" placeholder="Observações extras..."></textarea>
+          </div>
+
+          <button class="button primary" id="saveButton" type="submit">Cadastrar Ataque</button>
+        </form>
+      </section>
+      <div class="message" id="message" hidden></div>
+    </main>
+
+    <script>
+      function setupThemeToggle() {
+        const key = "siege-helper-theme";
+        const button = document.getElementById("themeToggle");
+        const applyTheme = (theme) => {
+          document.documentElement.dataset.theme = theme;
+          if (button) button.textContent = theme === "light" ? "Dark" : "Light";
+        };
+        applyTheme(localStorage.getItem(key) || "dark");
+        if (button) {
+          button.addEventListener("click", () => {
+            const nextTheme = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+            localStorage.setItem(key, nextTheme);
+            applyTheme(nextTheme);
+          });
+        }
+      }
+      setupThemeToggle();
+
+      const IMG_BASE = "https://swarfarm.com/static/herders/images/monsters/";
+      const urlParams = new URLSearchParams(location.search);
+      const attackId = location.pathname.match(/\/attacks\/(\d+)\/edit/)?.[1] || "";
+      let selectedDefenseId = urlParams.get("defense_id") || "";
+      const isEditMode = Boolean(attackId);
+      const defenseSelect = document.getElementById("defenseSelect");
+      const message = document.getElementById("message");
+      const saveButton = document.getElementById("saveButton");
+      const formTitle = document.getElementById("formTitle");
+      const focusPickerField = document.getElementById("focusPickerField");
+      const focusPicker = document.getElementById("focusPicker");
+      const focusOrderInput = document.getElementById("focusOrder");
+      const monsterBuildsField = document.getElementById("monsterBuildsField");
+      const monsterBuilds = document.getElementById("monsterBuilds");
+      const portraitCache = new Map();
+      const RUNE_SETS = [
+        { name: "Violent", icon: "VI", color: "#7c3aed" },
+        { name: "Will", icon: "WI", color: "#2563eb" },
+        { name: "Swift", icon: "SW", color: "#0891b2" },
+        { name: "Despair", icon: "DE", color: "#9333ea" },
+        { name: "Revenge", icon: "RV", color: "#dc2626" },
+        { name: "Destroy", icon: "DS", color: "#b45309" },
+        { name: "Nemesis", icon: "NE", color: "#ea580c" },
+        { name: "Shield", icon: "SH", color: "#16a34a" },
+        { name: "Fight", icon: "FI", color: "#be123c" },
+        { name: "Determination", icon: "DT", color: "#4d7c0f" },
+        { name: "Enhance", icon: "EN", color: "#0d9488" },
+        { name: "Accuracy", icon: "AC", color: "#0284c7" },
+        { name: "Tolerance", icon: "TO", color: "#64748b" },
+        { name: "Energy", icon: "EG", color: "#15803d" },
+        { name: "Blade", icon: "BL", color: "#c2410c" },
+        { name: "Rage", icon: "RA", color: "#991b1b" },
+        { name: "Fatal", icon: "FA", color: "#7f1d1d" },
+        { name: "Guard", icon: "GU", color: "#475569" },
+        { name: "Focus", icon: "FO", color: "#0369a1" },
+        { name: "Endure", icon: "ED", color: "#854d0e" },
+        { name: "Vampire", icon: "VA", color: "#9f1239" },
+      ];
+      const STAT_OPTIONS = [
+        { key: "hp", label: "HP" },
+        { key: "atk", label: "ATK" },
+        { key: "def", label: "DEF" },
+        { key: "spd", label: "Speed" },
+        { key: "cr", label: "Cr. Rate %" },
+        { key: "cd", label: "Cr. Dmg %" },
+        { key: "res", label: "Res %" },
+        { key: "acc", label: "Acc %" },
+      ];
+      const selectedAttackMonsters = {
+        monster1: null,
+        monster2: null,
+        monster3: null,
+      };
+      const monsterBuildValues = {
+        monster1: { runes: [], stats: {} },
+        monster2: { runes: [], stats: {} },
+        monster3: { runes: [], stats: {} },
+      };
+      let currentDefense = null;
+      let focusOrder = [];
+      let pendingFocusOrder = [];
+      let activeBuildId = "monster1";
+
+      if (isEditMode) {
+        formTitle.textContent = "Editar Ataque";
+        saveButton.textContent = "Salvar Alterações";
+      }
+
+      for (let season = 25; season >= 1; season -= 1) {
+        const option = document.createElement("option");
+        option.value = `Season ${season}`;
+        option.textContent = `Season ${season}`;
+        document.getElementById("season").appendChild(option);
+      }
+
+      function showMessage(text, isError = false) {
+        message.hidden = false;
+        message.textContent = text;
+        message.style.color = isError ? "#f87171" : "#94a3b8";
+      }
+
+      function optionMarkup(defense) {
+        return `<option value="${defense.id}">${defense.name}</option>`;
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      async function lookupPortrait(name) {
+        const key = name.toLowerCase();
+        if (portraitCache.has(key)) return portraitCache.get(key);
+        portraitCache.set(key, null);
+        try {
+          const query = new URLSearchParams({ name, page_size: "10" });
+          const response = await fetch(`/api/monster-search?${query}`);
+          if (!response.ok) return null;
+          const data = await response.json();
+          const results = data.results || [];
+          const match = results.find((item) => item.name?.toLowerCase() === key) || results[0];
+          const portrait = match?.image_filename ? `${IMG_BASE}${match.image_filename}` : null;
+          portraitCache.set(key, portrait);
+          return portrait;
+        } catch {
+          return null;
+        }
+      }
+
+      function syncFocusText() {
+        focusOrderInput.value = focusOrder
+          .map((name, index) => `${index + 1}. ${name}`)
+          .join("\n");
+      }
+
+      function parseFocusOrder(raw) {
+        return String(raw || "")
+          .split("\n")
+          .map((line) => line.replace(/^\s*\d+\.\s*/, "").trim())
+          .filter(Boolean);
+      }
+
+      async function renderFocusPicker() {
+        if (!currentDefense) {
+          focusPickerField.hidden = true;
+          focusPicker.innerHTML = "";
+          focusOrder = [];
+          syncFocusText();
+          return;
+        }
+
+        const names = [currentDefense.monster1, currentDefense.monster2, currentDefense.monster3];
+        focusPickerField.hidden = false;
+        const tiles = await Promise.all(names.map(async (name) => {
+          const imageUrl = await lookupPortrait(name);
+          const rank = focusOrder.indexOf(name) + 1;
+          return `
+            <button class="focus-target ${rank ? "selected" : ""}" type="button" data-focus-name="${escapeHtml(name)}">
+              ${rank ? `<span class="focus-rank">${rank}</span>` : ""}
+              <span class="focus-portrait">
+                ${imageUrl
+                  ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.remove()" />`
+                  : escapeHtml(name.slice(0, 1))}
+              </span>
+              <span class="focus-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
+            </button>
+          `;
+        }));
+        focusPicker.innerHTML = tiles.join("");
+      }
+
+      async function loadDefenseDetail(defenseId) {
+        if (!defenseId) {
+          currentDefense = null;
+          await renderFocusPicker();
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/defense-detail?id=${encodeURIComponent(defenseId)}`);
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || "Erro ao carregar defesa");
+          currentDefense = data.defense;
+          const defenseNames = [currentDefense.monster1, currentDefense.monster2, currentDefense.monster3];
+          focusOrder = pendingFocusOrder.length
+            ? pendingFocusOrder.filter((name) => defenseNames.includes(name))
+            : [];
+          pendingFocusOrder = [];
+          syncFocusText();
+          await renderFocusPicker();
+        } catch (error) {
+          currentDefense = null;
+          await renderFocusPicker();
+          showMessage(error.message || "Erro ao carregar defesa.", true);
+        }
+      }
+
+      async function loadDefenses() {
+        try {
+          const response = await fetch("/api/defenses-list");
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || "Erro ao carregar defesas");
+
+          const defenses = (data.results || []).map((item) => item.defense);
+          if (selectedDefenseId && !defenses.some((defense) => String(defense.id) === selectedDefenseId)) {
+            const detailResponse = await fetch(`/api/defense-detail?id=${encodeURIComponent(selectedDefenseId)}`);
+            if (detailResponse.ok) {
+              const detail = await detailResponse.json();
+              defenses.unshift(detail.defense);
+            }
+          }
+          defenseSelect.innerHTML = `<option value="">Selecione uma defesa</option>${defenses.map(optionMarkup).join("")}`;
+
+          if (selectedDefenseId) {
+            const exists = defenses.some((defense) => String(defense.id) === selectedDefenseId);
+            if (exists) defenseSelect.value = selectedDefenseId;
+          }
+          await loadDefenseDetail(defenseSelect.value);
+        } catch (error) {
+          defenseSelect.innerHTML = `<option value="">Erro ao carregar defesas</option>`;
+          showMessage(error.message || "Erro ao carregar defesas.", true);
+        }
+      }
+
+      function value(id) {
+        return document.getElementById(id).value.trim();
+      }
+
+      function setValue(id, nextValue) {
+        document.getElementById(id).value = nextValue || "";
+      }
+
+      function parseRequirements(raw) {
+        if (!raw) return { notes: "", monsters: [] };
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.monsters)) {
+            return { notes: parsed.notes || "", monsters: parsed.monsters };
+          }
+        } catch {}
+        return { notes: raw, monsters: [] };
+      }
+
+      function normalizeBuild(build) {
+        const runeNames = Array.isArray(build?.runes)
+          ? build.runes
+          : String(build?.runes || "")
+              .split("+")
+              .map((item) => item.trim())
+              .filter(Boolean);
+        const stats = {};
+        if (Array.isArray(build?.stats)) {
+          build.stats.forEach((item) => {
+            if (item?.key && item?.value) stats[item.key] = String(item.value);
+          });
+        } else if (build?.statValues && typeof build.statValues === "object") {
+          Object.assign(stats, build.statValues);
+        } else if (typeof build?.stats === "string" && build.stats.trim()) {
+          stats.notes = build.stats.trim();
+        }
+        return { runes: runeNames, stats };
+      }
+
+      function collectMonsterBuilds() {
+        return ["monster1", "monster2", "monster3"].map((id, index) => {
+          const monsterName = value(id);
+          const build = monsterBuildValues[id] || { runes: [], stats: {} };
+          const stats = STAT_OPTIONS
+            .map((stat) => ({
+              key: stat.key,
+              label: stat.label,
+              value: String(build.stats?.[stat.key] || "").trim(),
+            }))
+            .filter((item) => item.value);
+          return {
+            slot: index + 1,
+            monster: monsterName,
+            runes: build.runes || [],
+            stats,
+          };
+        }).filter((item) => item.monster && (item.runes.length || item.stats.length));
+      }
+
+      function buildRequirementsPayload() {
+        const notes = value("requirements");
+        const builds = collectMonsterBuilds();
+        if (!notes && !builds.length) return "";
+        return JSON.stringify({ notes, monsters: builds });
+      }
+
+      function generatedName() {
+        return [value("monster1"), value("monster2"), value("monster3")].filter(Boolean).join(" / ");
+      }
+
+      function setGeneratedNameIfBlank() {
+        const nameInput = document.getElementById("nameInput");
+        if (!nameInput.value.trim()) nameInput.value = generatedName();
+      }
+
+      const searchTimers = new Map();
+
+      function closeMonsterResults(id) {
+        const resultBox = document.getElementById(`${id}Results`);
+        resultBox.className = "";
+        resultBox.innerHTML = "";
+      }
+
+      function closeAllMonsterResults(exceptId = "") {
+        ["monster1", "monster2", "monster3"].forEach((id) => {
+          if (id !== exceptId) closeMonsterResults(id);
+        });
+      }
+
+      function renderSelectedMonster(id) {
+        const input = document.getElementById(id);
+        const selectedBox = document.getElementById(`${id}Selected`);
+        const selected = selectedAttackMonsters[id];
+        if (!selected) {
+          selectedBox.innerHTML = "";
+          input.hidden = false;
+          return;
+        }
+
+        input.hidden = true;
+        selectedBox.innerHTML = `
+          <div class="selected-monster ${activeBuildId === id ? "active" : ""}" data-edit-build="${id}">
+            ${selected.image_filename
+              ? `<img src="${IMG_BASE}${escapeHtml(selected.image_filename)}" alt="${escapeHtml(selected.name)}" loading="lazy" />`
+              : `<span class="selected-monster-fallback">${escapeHtml(selected.name.slice(0, 1))}</span>`}
+            <div class="selected-monster-name" title="${escapeHtml(selected.name)}">${escapeHtml(selected.name)}</div>
+            <button class="icon-button" type="button" data-clear-monster="${id}" aria-label="Trocar monstro">×</button>
+          </div>
+        `;
+      }
+
+      function renderMonsterBuilds() {
+        const ids = ["monster1", "monster2", "monster3"];
+        const selected = ids
+          .map((id, index) => ({ id, index: index + 1, monster: selectedAttackMonsters[id] }))
+          .filter((item) => item.monster);
+
+        monsterBuildsField.hidden = selected.length === 0;
+        if (!selected.length) {
+          monsterBuilds.innerHTML = "";
+          return;
+        }
+
+        if (!selected.some((item) => item.id === activeBuildId)) {
+          activeBuildId = selected[0].id;
+        }
+        ids.forEach(renderSelectedMonster);
+
+        const active = selected.find((item) => item.id === activeBuildId);
+        const build = monsterBuildValues[active.id] || { runes: [], stats: {} };
+        const selectedRuneSummary = build.runes.length ? build.runes.join(" + ") : "Nenhuma runa selecionada";
+        const filledStatCount = STAT_OPTIONS.filter((stat) => build.stats?.[stat.key]).length;
+
+        monsterBuilds.innerHTML = `
+          <div class="monster-build" data-build-id="${active.id}">
+            <div class="build-panel-head">
+              <div>
+                <div class="monster-build-name" title="${escapeHtml(active.monster.name)}">Runas e stats de ${escapeHtml(active.monster.name)}</div>
+                <div class="hint" style="margin-top: 3px;">${escapeHtml(selectedRuneSummary)}${filledStatCount ? ` · ${filledStatCount} stats preenchidos` : ""}. Clique em outro monstro acima para trocar.</div>
+              </div>
+            </div>
+            <div class="monster-build-fields">
+              <div>
+                <div class="build-label">Runas</div>
+                <div class="rune-grid">
+                  ${RUNE_SETS.map((rune) => {
+                    const selectedRune = build.runes?.includes(rune.name);
+                    return `
+                      <button
+                        class="rune-chip ${selectedRune ? "selected" : ""}"
+                        type="button"
+                        data-rune-for="${active.id}"
+                        data-rune-name="${escapeHtml(rune.name)}"
+                      >
+                        <span class="rune-icon" style="--rune-color: ${escapeHtml(rune.color)}">${escapeHtml(rune.icon)}</span>
+                        <span class="rune-name">${escapeHtml(rune.name)}</span>
+                      </button>
+                    `;
+                  }).join("")}
+                </div>
+              </div>
+              <div>
+                <div class="build-label">Stats necessários</div>
+                <div class="stats-grid">
+                  ${STAT_OPTIONS.map((stat) => `
+                    <div class="stat-input">
+                      <label for="${active.id}Stat${stat.key}">${escapeHtml(stat.label)}</label>
+                      <input
+                        id="${active.id}Stat${stat.key}"
+                        inputmode="numeric"
+                        data-stat-for="${active.id}"
+                        data-stat-key="${escapeHtml(stat.key)}"
+                        value="${escapeHtml(build.stats?.[stat.key] || "")}"
+                        placeholder="Opcional"
+                      />
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function clearSelectedMonster(id) {
+        selectedAttackMonsters[id] = null;
+        monsterBuildValues[id] = { runes: [], stats: {} };
+        if (activeBuildId === id) {
+          activeBuildId = ["monster1", "monster2", "monster3"].find((item) => item !== id && selectedAttackMonsters[item]) || "monster1";
+        }
+        const input = document.getElementById(id);
+        input.value = "";
+        renderSelectedMonster(id);
+        renderMonsterBuilds();
+        closeMonsterResults(id);
+      }
+
+      function selectAttackMonster(id, monster) {
+        selectedAttackMonsters[id] = monster;
+        activeBuildId = id;
+        const input = document.getElementById(id);
+        input.value = monster.name;
+        closeMonsterResults(id);
+        renderSelectedMonster(id);
+        renderMonsterBuilds();
+        setGeneratedNameIfBlank();
+      }
+
+      function renderMonsterResults(id, monsters) {
+        const resultBox = document.getElementById(`${id}Results`);
+        if (!monsters.length) {
+          resultBox.className = "monster-empty";
+          resultBox.textContent = "Nenhum monstro encontrado";
+          return;
+        }
+
+        resultBox.className = "monster-results";
+        resultBox.innerHTML = monsters.map((monster) => `
+          <button
+            class="monster-option"
+            type="button"
+            data-monster-input="${id}"
+            data-monster-id="${escapeHtml(monster.id)}"
+            data-monster-name="${escapeHtml(monster.name)}"
+            data-monster-image="${escapeHtml(monster.image_filename || "")}"
+            data-monster-element="${escapeHtml(monster.element || "")}"
+          >
+            ${monster.image_filename
+              ? `<img src="${IMG_BASE}${escapeHtml(monster.image_filename)}" alt="${escapeHtml(monster.name)}" loading="lazy" />`
+              : `<span>${escapeHtml(monster.name.slice(0, 1))}</span>`}
+            <span title="${escapeHtml(monster.name)}">${escapeHtml(monster.name)}</span>
+          </button>
+        `).join("");
+      }
+
+      async function searchMonsters(id, queryText) {
+        const resultBox = document.getElementById(`${id}Results`);
+        if (queryText.trim().length < 2) {
+          resultBox.className = "monster-empty";
+          resultBox.textContent = "Digite pelo menos 2 letras";
+          return;
+        }
+
+        resultBox.className = "monster-empty";
+        resultBox.textContent = "Buscando...";
+        try {
+          const query = new URLSearchParams({ name: queryText.trim(), page_size: "50" });
+          const response = await fetch(`/api/monster-search?${query}`);
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || "Erro ao buscar monstro");
+          renderMonsterResults(id, data.results || []);
+        } catch (error) {
+          resultBox.className = "monster-empty";
+          resultBox.textContent = error.message || "Erro ao buscar monstro";
+        }
+      }
+
+      async function findMonsterByName(name) {
+        try {
+          const query = new URLSearchParams({ name, page_size: "10" });
+          const response = await fetch(`/api/monster-search?${query}`);
+          if (!response.ok) throw new Error("Erro ao buscar monstro");
+          const data = await response.json();
+          return (data.results || []).find((item) => item.name?.toLowerCase() === name.toLowerCase())
+            || (data.results || [])[0]
+            || { name, image_filename: "" };
+        } catch {
+          return { name, image_filename: "" };
+        }
+      }
+
+      async function setSelectedMonsterFromName(id, name) {
+        if (!name) return;
+        const monster = await findMonsterByName(name);
+        selectedAttackMonsters[id] = {
+          id: monster.id || "",
+          name,
+          image_filename: monster.image_filename || "",
+          element: monster.element || "",
+        };
+        document.getElementById(id).value = name;
+        renderSelectedMonster(id);
+      }
+
+      async function loadAttackForEdit() {
+        if (!isEditMode) return;
+        try {
+          const response = await fetch(`/api/attack-detail?id=${encodeURIComponent(attackId)}`);
+          const attack = await response.json();
+          if (!response.ok) throw new Error(attack.detail || "Erro ao carregar ataque");
+
+          selectedDefenseId = String(attack.defense_id);
+          setValue("nameInput", attack.name);
+          setValue("attackType", attack.attack_type);
+          setValue("successRate", attack.success_rate);
+          setValue("recommendation", attack.recommendation);
+          setValue("focusOrder", attack.focus_order);
+          pendingFocusOrder = parseFocusOrder(attack.focus_order);
+          setValue("tips", attack.tips);
+          setValue("risks", attack.risks);
+          setValue("observations", attack.observations);
+          setValue("season", attack.season || "Season 25");
+
+          const requirements = parseRequirements(attack.requirements);
+          setValue("requirements", requirements.notes);
+          await Promise.all([
+            setSelectedMonsterFromName("monster1", attack.monster1),
+            setSelectedMonsterFromName("monster2", attack.monster2),
+            setSelectedMonsterFromName("monster3", attack.monster3),
+          ]);
+          ["monster1", "monster2", "monster3"].forEach((id, index) => {
+            const name = value(id);
+            const build = requirements.monsters.find((item) => item.slot === index + 1 || item.monster === name);
+            if (build) monsterBuildValues[id] = normalizeBuild(build);
+          });
+          renderMonsterBuilds();
+        } catch (error) {
+          showMessage(error.message || "Erro ao carregar ataque.", true);
+        }
+      }
+
+      ["monster1", "monster2", "monster3"].forEach((id) => {
+        const input = document.getElementById(id);
+        input.addEventListener("input", () => {
+          closeAllMonsterResults(id);
+          clearTimeout(searchTimers.get(id));
+          searchTimers.set(id, setTimeout(() => searchMonsters(id, input.value), 250));
+        });
+        input.addEventListener("focus", () => {
+          closeAllMonsterResults(id);
+          if (input.value.trim()) searchMonsters(id, input.value);
+        });
+      });
+
+      document.addEventListener("click", (event) => {
+        const option = event.target.closest("[data-monster-input]");
+        if (option) {
+          const inputId = option.dataset.monsterInput;
+          selectAttackMonster(inputId, {
+            id: option.dataset.monsterId,
+            name: option.dataset.monsterName,
+            image_filename: option.dataset.monsterImage,
+            element: option.dataset.monsterElement,
+          });
+          return;
+        }
+
+        const clearButton = event.target.closest("[data-clear-monster]");
+        if (clearButton) {
+          clearSelectedMonster(clearButton.dataset.clearMonster);
+          document.getElementById(clearButton.dataset.clearMonster).focus();
+          return;
+        }
+
+        const selectedMonster = event.target.closest("[data-edit-build]");
+        if (selectedMonster) {
+          activeBuildId = selectedMonster.dataset.editBuild;
+          renderMonsterBuilds();
+          return;
+        }
+
+        const runeButton = event.target.closest("[data-rune-for]");
+        if (runeButton) {
+          const id = runeButton.dataset.runeFor;
+          const runeName = runeButton.dataset.runeName;
+          const runes = monsterBuildValues[id].runes;
+          if (runes.includes(runeName)) {
+            monsterBuildValues[id].runes = runes.filter((item) => item !== runeName);
+          } else {
+            monsterBuildValues[id].runes = [...runes, runeName];
+          }
+          renderMonsterBuilds();
+          return;
+        }
+
+        if (!event.target.closest(".monster-search")) {
+          closeAllMonsterResults();
+        }
+      });
+
+      monsterBuilds.addEventListener("input", (event) => {
+        const statFor = event.target.dataset.statFor;
+        const statKey = event.target.dataset.statKey;
+        if (statFor && statKey && monsterBuildValues[statFor]) {
+          monsterBuildValues[statFor].stats[statKey] = event.target.value;
+        }
+      });
+
+      defenseSelect.addEventListener("change", () => {
+        loadDefenseDetail(defenseSelect.value);
+      });
+
+      focusPicker.addEventListener("click", async (event) => {
+        const target = event.target.closest("[data-focus-name]");
+        if (!target) return;
+        const name = target.dataset.focusName;
+        if (focusOrder.includes(name)) {
+          focusOrder = focusOrder.filter((item) => item !== name);
+        } else if (focusOrder.length < 3) {
+          focusOrder.push(name);
+        }
+        syncFocusText();
+        await renderFocusPicker();
+      });
+
+      document.getElementById("clearFocusButton").addEventListener("click", async () => {
+        focusOrder = [];
+        syncFocusText();
+        await renderFocusPicker();
+      });
+
+      document.getElementById("attackForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!defenseSelect.value) {
+          showMessage("Selecione uma defesa.", true);
+          return;
+        }
+
+        const name = value("nameInput") || generatedName();
+        const payload = {
+          defense_id: Number(defenseSelect.value),
+          name,
+          monster1: value("monster1"),
+          monster2: value("monster2"),
+          monster3: value("monster3"),
+          attack_type: value("attackType"),
+          success_rate: value("successRate"),
+          recommendation: value("recommendation"),
+          focus_order: value("focusOrder"),
+          tips: value("tips"),
+          risks: value("risks"),
+          requirements: buildRequirementsPayload(),
+          observations: value("observations"),
+          season: value("season"),
+        };
+
+        saveButton.disabled = true;
+        saveButton.textContent = isEditMode ? "Salvando..." : "Salvando...";
+        try {
+          const response = await fetch(isEditMode ? `/api/attacks/${attackId}` : "/api/attacks", {
+            method: isEditMode ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || "Erro ao salvar ataque");
+          location.href = isEditMode ? `/attacks/${attackId}` : `/defenses/${payload.defense_id}`;
+        } catch (error) {
+          showMessage(error.message || "Erro ao salvar ataque.", true);
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = isEditMode ? "Salvar Alterações" : "Cadastrar Ataque";
+        }
+      });
+
+      (async () => {
+        await loadAttackForEdit();
+        await loadDefenses();
+      })();
+    </script>
+  </body>
+</html>

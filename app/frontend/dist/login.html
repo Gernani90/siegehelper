@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Siege Helper</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #090d16;
+        color: #e5e7eb;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        margin: 0;
+        background:
+          radial-gradient(circle at 18% 0%, rgba(216, 173, 95, 0.18), transparent 34%),
+          radial-gradient(circle at 86% 12%, rgba(78, 167, 216, 0.16), transparent 32%),
+          linear-gradient(135deg, rgba(8, 11, 18, 0.98), rgba(13, 21, 33, 0.98) 46%, rgba(31, 26, 20, 0.98));
+        padding: 24px;
+      }
+
+      a { color: inherit; text-decoration: none; }
+
+      .shell {
+        width: min(460px, 100%);
+        border: 1px solid rgba(187, 147, 72, 0.32);
+        border-radius: 8px;
+        background:
+          radial-gradient(circle at 18% 0%, rgba(216, 173, 95, 0.16), transparent 34%),
+          linear-gradient(180deg, rgba(33, 42, 60, 0.94), rgba(24, 31, 45, 0.82));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 24px 70px rgba(0, 0, 0, 0.32);
+        padding: 28px;
+        text-align: center;
+      }
+
+      .logo {
+        display: block;
+        width: 112px;
+        height: 112px;
+        margin: 0 auto 16px;
+        border: 1px solid rgba(244, 211, 138, 0.38);
+        border-radius: 999px;
+        object-fit: cover;
+        box-shadow: 0 0 34px rgba(216, 173, 95, 0.28);
+      }
+
+      h1 {
+        margin: 0;
+        color: #fff3cf;
+        font-size: 34px;
+        line-height: 1.1;
+      }
+
+      p {
+        margin: 12px 0 24px;
+        color: #a8b6c8;
+        line-height: 1.5;
+      }
+
+      .guild {
+        margin-top: 6px;
+        color: #f4d38a;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      input {
+        width: 100%;
+        min-height: 44px;
+        border: 1px solid rgba(102, 125, 154, 0.44);
+        border-radius: 8px;
+        background: rgba(7, 10, 18, 0.58);
+        color: #f8fafc;
+        outline: none;
+        padding: 0 12px;
+      }
+
+      input:focus {
+        border-color: #d8ad5f;
+        box-shadow: 0 0 0 3px rgba(216, 173, 95, 0.18);
+      }
+
+      .error {
+        min-height: 18px;
+        margin: 0;
+        color: #f87171;
+        font-size: 13px;
+      }
+
+      .button {
+        display: inline-flex;
+        width: 100%;
+        min-height: 46px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(244, 211, 138, 0.42);
+        border-radius: 8px;
+        background: linear-gradient(180deg, #b98535, #7e5523);
+        color: #fff;
+        font-weight: 800;
+        box-shadow: 0 12px 28px rgba(126, 85, 35, 0.28);
+        cursor: pointer;
+      }
+
+      .button:hover {
+        background: linear-gradient(180deg, #d09a45, #8e6129);
+      }
+
+      .footer {
+        margin: 22px 0 0;
+        color: #64748b;
+        font-size: 12px;
+      }
+    </style>
+    <link rel="stylesheet" href="/theme.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <img class="logo" src="/assets/guild-logo-op.png" alt="Ordem & Progress" />
+      <h1>Siege Helper</h1>
+      <div class="guild">Guild Ordem &amp; Progress</div>
+      <p>Consulte defesas, cadastre ataques e organize counters de siege.</p>
+      <form id="loginForm">
+        <input id="username" autocomplete="username" placeholder="Usuário" />
+        <input id="password" autocomplete="current-password" placeholder="Senha" type="password" />
+        <p class="error" id="error"></p>
+        <button class="button" type="submit">Entrar</button>
+      </form>
+      <p class="footer">© 2026 Ordem &amp; Progress</p>
+    </main>
+    <script>
+      const AUTH_KEY = "siege_helper_auth";
+      const params = new URLSearchParams(location.search);
+      if (params.get("logout") === "1") {
+        localStorage.removeItem(AUTH_KEY);
+        history.replaceState(null, "", "/");
+      }
+      const theme = localStorage.getItem("siege-helper-theme") || "dark";
+      document.documentElement.dataset.theme = theme;
+
+      document.getElementById("loginForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+        const error = document.getElementById("error");
+        if (username === "swsiege" && password === "gorduxo123") {
+          localStorage.setItem(AUTH_KEY, JSON.stringify({ username }));
+          location.href = "/dashboard";
+          return;
+        }
+        error.textContent = "Usuário ou senha incorretos";
+      });
+    </script>
+  </body>
+</html>

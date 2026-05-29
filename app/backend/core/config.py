@@ -16,32 +16,11 @@ class Settings(BaseSettings):
     # Server
     host: str = "0.0.0.0"
     port: int = 8000
-    frontend_url: str = "http://127.0.0.1:3000"
 
     # AWS Lambda Configuration
     is_lambda: bool = False
     lambda_function_name: str = "fastapi-backend"
     aws_region: str = "us-east-1"
-
-    # Database
-    database_url: str = "sqlite:///./local_app.db"
-
-    # Auth
-    jwt_secret_key: str = "dev-secret-key"
-    jwt_algorithm: str = "HS256"
-    jwt_expire_minutes: int = 60 * 24
-    oidc_issuer_url: str = ""
-    oidc_client_id: str = ""
-    oidc_client_secret: str = ""
-    oidc_scope: str = "openid profile email"
-    admin_user_id: str = ""
-
-    # Optional integrations
-    app_ai_base_url: str = ""
-    app_ai_key: str = ""
-    oss_service_url: str = ""
-    oss_api_key: str = ""
-    stripe_secret_key: str = ""
 
     @property
     def backend_url(self) -> str:
@@ -59,7 +38,6 @@ class Settings(BaseSettings):
     class Config:
         case_sensitive = False
         extra = "ignore"
-        env_file = ".env"
 
     def __getattr__(self, name: str) -> Any:
         """
