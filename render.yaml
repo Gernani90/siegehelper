@@ -23,7 +23,7 @@ services:
     runtime: node
     plan: free
     rootDir: app/frontend
-    buildCommand: echo "Using checked-in frontend dist"
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm run build
     startCommand: node serve-dist.mjs
     envVars:
       - key: PYTHON_BACKEND_URL
@@ -31,8 +31,6 @@ services:
           name: siege-helper-api
           type: web
           property: hostport
-      - key: SKIP_INSTALL_DEPS
-        value: true
 
 databases:
   - name: siege-helper-db

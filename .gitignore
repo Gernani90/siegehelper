@@ -11,6 +11,7 @@ __pycache__/
 *.sqlite3
 logs/
 app/backend/logs/
+*.log
 uploads/
 .atoms/
 .wiki.md
@@ -22,6 +23,7 @@ visual-backup-*/
 !.env.example
 
 # Build/cache output
+dist/
 dist/assets/*.js
 dist/assets/*.css
 .DS_Store
