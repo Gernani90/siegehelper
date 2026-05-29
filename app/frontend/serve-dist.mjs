@@ -61,6 +61,31 @@ function resolvePath(urlPath) {
 
 createServer((req, res) => {
   const requestPath = (req.url || "/").split("?")[0];
+  if (requestPath.startsWith("/api/v1/")) {
+    const targetUrl = `${backendBaseUrl}${req.url || "/"}`;
+    const headers = { ...req.headers };
+    delete headers.host;
+
+    fetch(targetUrl, {
+      method: req.method,
+      headers,
+      body: req.method === "GET" || req.method === "HEAD" ? undefined : req,
+      duplex: "half",
+    })
+      .then(async (response) => {
+        res.writeHead(response.status, Object.fromEntries(response.headers.entries()));
+        res.end(Buffer.from(await response.arrayBuffer()));
+      })
+      .catch((error) => {
+        res.writeHead(502, {
+          "Content-Type": "application/json; charset=utf-8",
+          "Cache-Control": "no-store",
+        });
+        res.end(JSON.stringify({ detail: error.message || "Erro ao acessar backend" }));
+      });
+    return;
+  }
+
   if (requestPath === "/api/defenses-list") {
     fetch(`${backendBaseUrl}/api/v1/search/defenses?limit=100`)
       .then(async (response) => {
