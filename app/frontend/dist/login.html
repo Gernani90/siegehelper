@@ -142,21 +142,32 @@
     </main>
     <script>
       const AUTH_KEY = "siege_helper_auth";
+      const storage = {
+        get(key) {
+          try { return window.localStorage.getItem(key); } catch { return null; }
+        },
+        set(key, value) {
+          try { window.localStorage.setItem(key, value); } catch {}
+        },
+        remove(key) {
+          try { window.localStorage.removeItem(key); } catch {}
+        }
+      };
       const params = new URLSearchParams(location.search);
       if (params.get("logout") === "1") {
-        localStorage.removeItem(AUTH_KEY);
+        storage.remove(AUTH_KEY);
         history.replaceState(null, "", "/");
       }
-      const theme = localStorage.getItem("siege-helper-theme") || "dark";
+      const theme = storage.get("siege-helper-theme") || "dark";
       document.documentElement.dataset.theme = theme;
 
       document.getElementById("loginForm").addEventListener("submit", (event) => {
         event.preventDefault();
         const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value;
+        const password = document.getElementById("password").value.trim();
         const error = document.getElementById("error");
-        if (username === "swsiege" && password === "gorduxo123") {
-          localStorage.setItem(AUTH_KEY, JSON.stringify({ username }));
+        if (username.toLowerCase() === "swsiege" && password === "gorduxo123") {
+          storage.set(AUTH_KEY, JSON.stringify({ username: "swsiege" }));
           location.href = "/dashboard";
           return;
         }
