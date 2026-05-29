@@ -1,0 +1,82 @@
+{
+    "title": "attacks",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "defense_id": {
+            "type": "integer",
+            "description": "Related defense ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Attack name"
+        },
+        "monster1": {
+            "type": "string",
+            "description": "First monster name"
+        },
+        "monster2": {
+            "type": "string",
+            "description": "Second monster name"
+        },
+        "monster3": {
+            "type": "string",
+            "description": "Third monster name"
+        },
+        "attack_type": {
+            "type": "string",
+            "description": "Attack type"
+        },
+        "success_rate": {
+            "type": "string",
+            "description": "Success rate level"
+        },
+        "recommendation": {
+            "type": "string",
+            "description": "Recommendation level"
+        },
+        "focus_order": {
+            "type": "string",
+            "description": "Focus order description"
+        },
+        "tips": {
+            "type": "string",
+            "description": "Tips for the attack"
+        },
+        "risks": {
+            "type": "string",
+            "description": "Risks involved"
+        },
+        "requirements": {
+            "type": "string",
+            "description": "Requirements for the attack"
+        },
+        "observations": {
+            "type": "string",
+            "description": "Optional observations"
+        },
+        "season": {
+            "type": "string",
+            "description": "Siege season identifier"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "defense_id",
+        "name",
+        "monster1",
+        "monster2",
+        "monster3",
+        "attack_type",
+        "success_rate",
+        "recommendation"
+    ]
+}

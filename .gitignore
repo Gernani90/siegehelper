@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local runtime data
+*.db
+*.sqlite
+*.sqlite3
+logs/
+app/backend/logs/
+uploads/
+.atoms/
+.wiki.md
+visual-backup-*/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Build/cache output
+dist/assets/*.js
+dist/assets/*.css
+.DS_Store
+.vite/
+.pytest_cache/
+.ruff_cache/
+
+# Local editor/project files
+.idea/
+.vscode/

@@ -1,0 +1,81 @@
+{
+    "title": "defenses",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Defense name"
+        },
+        "monster1": {
+            "type": "string",
+            "description": "First monster name"
+        },
+        "monster2": {
+            "type": "string",
+            "description": "Second monster name"
+        },
+        "monster3": {
+            "type": "string",
+            "description": "Third monster name"
+        },
+        "element1": {
+            "type": "string",
+            "description": "First monster element"
+        },
+        "element2": {
+            "type": "string",
+            "description": "Second monster element"
+        },
+        "element3": {
+            "type": "string",
+            "description": "Third monster element"
+        },
+        "tower": {
+            "type": "string",
+            "description": "Tower type: 4star or 5star"
+        },
+        "defense_type": {
+            "type": "string",
+            "description": "Defense type"
+        },
+        "difficulty": {
+            "type": "string",
+            "description": "Difficulty level"
+        },
+        "observations": {
+            "type": "string",
+            "description": "Optional observations"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status: active or inactive"
+        },
+        "season": {
+            "type": "string",
+            "description": "Siege season identifier"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name",
+        "monster1",
+        "monster2",
+        "monster3",
+        "element1",
+        "element2",
+        "element3",
+        "tower",
+        "defense_type",
+        "difficulty",
+        "status"
+    ]
+}

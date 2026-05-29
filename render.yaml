@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: siege-helper-api
+    runtime: python
+    plan: free
+    rootDir: app/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: siege-helper-db
+          property: connectionString
+      - key: IS_LAMBDA
+        value: false
+      - key: ENVIRONMENT
+        value: prod
+
+  - type: web
+    name: siege-helper-web
+    runtime: node
+    plan: free
+    rootDir: app/frontend
+    buildCommand: npm install && npm run build
+    startCommand: node serve-dist.mjs
+    envVars:
+      - key: PYTHON_BACKEND_URL
+        fromService:
+          name: siege-helper-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+
+databases:
+  - name: siege-helper-db
+    plan: free
