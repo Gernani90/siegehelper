@@ -1,65 +1,23 @@
-# Shadcn-UI Template Usage Instructions
+# Siege Helper Frontend
 
-## technology stack
+This frontend is the checked-in static app under `dist/`.
 
-This project is built with:
+There is intentionally no Vite/React source tree in this repository anymore. The previous `src/` version diverged from the deployed app and caused local/production mismatches.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Run locally
 
-All shadcn/ui components have been downloaded under `@/components/ui`.
-
-## File Structure
-
-- `index.html` - HTML entry point
-- `vite.config.ts` - Vite configuration file
-- `tailwind.config.ts` - Tailwind CSS configuration file
-- `package.json` - NPM dependencies and scripts
-- `src/main.tsx` - Project entry point
-- `src/App.tsx` - Router shell (imports pages and sets up routes)
-- `src/pages/Index.tsx` - Main page entry point for `/` by default; replace the placeholder page here unless you explicitly reroute `/` elsewhere
-- `src/index.css` - Existing CSS configuration
-
-## Components
-
-- All shadcn/ui components are pre-downloaded and available at `@/components/ui`
-
-## Styling
-
-- Add global styles to `src/index.css` or create new CSS files as needed
-- Use Tailwind classes for styling components
-
-## Development
-
-- Import components from `@/components/ui` in your React components
-- Customize the UI by modifying the Tailwind configuration
-- Do not stop after editing isolated components or only `src/App.tsx`. The default template homepage lives in `src/pages/Index.tsx`, and leaving `Welcome to Atoms` there means the app is still unfinished.
-- Completion check: either replace `src/pages/Index.tsx` with your real homepage, or update the `/` route in `src/App.tsx` so the live homepage no longer renders the default placeholder page.
-
-## Note
-
-- The `@/` path alias points to the `src/` directory
-- Do NOT modify `index.html` — the title, description, and logo use environment variable placeholders (`%VITE_APP_TITLE%`, etc.) that are configured at deployment time.
-
-# Commands
-
-**Install Dependencies**
+Start the backend first, then run:
 
 ```shell
-pnpm i
+PORT=3000 PYTHON_BACKEND_URL=http://127.0.0.1:8000 npm start
 ```
 
-**Start Preview**
+On Windows PowerShell:
 
-```shell
-pnpm run dev
+```powershell
+$env:PORT="3000"
+$env:PYTHON_BACKEND_URL="http://127.0.0.1:8000"
+npm start
 ```
 
-**To build**
-
-```shell
-pnpm run build
-```
+The static server serves `dist/` and proxies `/api/v1/*` to `PYTHON_BACKEND_URL`.
