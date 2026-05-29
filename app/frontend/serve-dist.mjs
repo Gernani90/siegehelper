@@ -5,10 +5,11 @@ import { extname, join, normalize } from "node:path";
 const root = join(process.cwd(), "dist");
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || "0.0.0.0";
-const backendBaseUrl = (process.env.PYTHON_BACKEND_URL || process.env.BACKEND_URL || "http://127.0.0.1:8000").replace(
+const rawBackendUrl = (process.env.PYTHON_BACKEND_URL || process.env.BACKEND_URL || "http://127.0.0.1:8000").replace(
   /\/$/,
   "",
 );
+const backendBaseUrl = /^https?:\/\//i.test(rawBackendUrl) ? rawBackendUrl : `http://${rawBackendUrl}`;
 
 const contentTypes = {
   ".css": "text/css; charset=utf-8",
