@@ -187,7 +187,10 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 @app.get("/")
 def root():
-    return {"message": "FastAPI Modular Template is running"}
+    return {
+        "message": "Siege Helper API is running",
+        "frontend": "Open the siege-helper-web URL on Render to use the app.",
+    }
 
 
 @app.get("/health")
