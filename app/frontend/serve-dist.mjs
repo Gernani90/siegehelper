@@ -90,7 +90,11 @@ createServer((req, res) => {
       duplex: "half",
     })
       .then(async (response) => {
-        res.writeHead(response.status, Object.fromEntries(response.headers.entries()));
+        const responseHeaders = Object.fromEntries(response.headers.entries());
+        delete responseHeaders["content-encoding"];
+        delete responseHeaders["content-length"];
+        delete responseHeaders["transfer-encoding"];
+        res.writeHead(response.status, responseHeaders);
         res.end(Buffer.from(await response.arrayBuffer()));
       })
       .catch((error) => {
