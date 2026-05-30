@@ -12,6 +12,7 @@ const rawBackendUrl = (process.env.PYTHON_BACKEND_URL || process.env.BACKEND_URL
 const backendBaseUrl = /^https?:\/\//i.test(rawBackendUrl) ? rawBackendUrl : `http://${rawBackendUrl}`;
 const publicBackendUrl = (process.env.PUBLIC_BACKEND_URL || "https://siege-helper-api.onrender.com").replace(/\/$/, "");
 const backendUrls = [...new Set([backendBaseUrl, publicBackendUrl].filter(Boolean))];
+const authCookieName = "siege_helper_auth";
 
 const contentTypes = {
   ".css": "text/css; charset=utf-8",
@@ -63,6 +64,35 @@ function resolvePath(urlPath) {
   return join(root, "login.html");
 }
 
+function parseCookies(cookieHeader = "") {
+  return Object.fromEntries(
+    cookieHeader
+      .split(";")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item) => {
+        const separator = item.indexOf("=");
+        if (separator === -1) return [item, ""];
+        return [item.slice(0, separator), decodeURIComponent(item.slice(separator + 1))];
+      }),
+  );
+}
+
+function isAuthenticated(req) {
+  const cookies = parseCookies(req.headers.cookie || "");
+  return cookies[authCookieName] === "swsiege";
+}
+
+function isProtectedPath(requestPath) {
+  return (
+    requestPath.startsWith("/api/") ||
+    requestPath === "/dashboard" ||
+    requestPath === "/home" ||
+    requestPath.startsWith("/defenses") ||
+    requestPath.startsWith("/attacks")
+  );
+}
+
 async function fetchBackend(pathname, options = {}) {
   let lastError;
 
@@ -79,6 +109,24 @@ async function fetchBackend(pathname, options = {}) {
 
 createServer((req, res) => {
   const requestPath = (req.url || "/").split("?")[0];
+  if (isProtectedPath(requestPath) && !isAuthenticated(req)) {
+    if (requestPath.startsWith("/api/")) {
+      res.writeHead(401, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+      });
+      res.end(JSON.stringify({ detail: "Login necessario" }));
+      return;
+    }
+
+    res.writeHead(302, {
+      Location: `/?next=${encodeURIComponent(req.url || "/dashboard")}`,
+      "Cache-Control": "no-store",
+    });
+    res.end();
+    return;
+  }
+
   if (requestPath.startsWith("/api/v1/")) {
     const headers = { ...req.headers };
     delete headers.host;

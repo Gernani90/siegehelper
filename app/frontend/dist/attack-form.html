@@ -256,7 +256,6 @@
         font-size: 12px;
         font-weight: 700;
         text-overflow: ellipsis;
-        white-space: nowrap;
       }
 
       .monster-empty {
@@ -276,7 +275,7 @@
 
       .selected-monster {
         display: grid;
-        grid-template-columns: 52px 1fr auto;
+        grid-template-columns: 52px minmax(0, 1fr) auto;
         align-items: center;
         gap: 10px;
         min-height: 64px;
@@ -319,12 +318,13 @@
       }
 
       .leader-note {
+        display: block;
         color: #f4d38a;
         font-size: 11px;
         font-weight: 800;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        line-height: 1.25;
+        white-space: normal;
+        overflow-wrap: anywhere;
       }
 
       .icon-button {

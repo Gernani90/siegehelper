@@ -153,9 +153,16 @@
           try { window.localStorage.removeItem(key); } catch {}
         }
       };
+      function setAuthCookie() {
+        document.cookie = `${AUTH_KEY}=swsiege; path=/; max-age=2592000; SameSite=Lax`;
+      }
+      function clearAuthCookie() {
+        document.cookie = `${AUTH_KEY}=; path=/; max-age=0; SameSite=Lax`;
+      }
       const params = new URLSearchParams(location.search);
       if (params.get("logout") === "1") {
         storage.remove(AUTH_KEY);
+        clearAuthCookie();
         history.replaceState(null, "", "/");
       }
       const theme = storage.get("siege-helper-theme") || "dark";
@@ -168,7 +175,9 @@
         const error = document.getElementById("error");
         if (username.toLowerCase() === "swsiege" && password === "gorduxo123") {
           storage.set(AUTH_KEY, JSON.stringify({ username: "swsiege" }));
-          location.href = "/dashboard";
+          setAuthCookie();
+          const nextUrl = params.get("next") || "/dashboard";
+          location.href = nextUrl.startsWith("/") ? nextUrl : "/dashboard";
           return;
         }
         error.textContent = "Usuário ou senha incorretos";
