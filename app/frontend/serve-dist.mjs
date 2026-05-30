@@ -22,7 +22,9 @@ const contentTypes = {
 };
 
 function resolvePath(urlPath) {
-  const cleanPath = normalize(decodeURIComponent(urlPath.split("?")[0])).replace(/^(\.\.[/\\])+/, "");
+  const cleanPath = normalize(decodeURIComponent(urlPath.split("?")[0]))
+    .replace(/\\/g, "/")
+    .replace(/^(\.\.\/)+/, "");
   if (cleanPath === "/" || cleanPath === "/login") {
     return join(root, "login.html");
   }
