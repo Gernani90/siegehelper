@@ -475,6 +475,16 @@
         message.style.color = isError ? "#f87171" : "#94a3b8";
       }
 
+      async function readJsonResponse(response, fallbackMessage) {
+        const text = await response.text();
+        if (!text) return {};
+        try {
+          return JSON.parse(text);
+        } catch {
+          throw new Error(fallbackMessage);
+        }
+      }
+
       function generatedName() {
         return [value("monster1"), value("monster2"), value("monster3")].filter(Boolean).join(" / ");
       }
@@ -691,8 +701,9 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
-          const data = await response.json();
+          const data = await readJsonResponse(response, "Erro ao salvar defesa. Tente novamente em alguns segundos.");
           if (!response.ok) throw new Error(data.detail || "Erro ao salvar defesa");
+          if (!data.id) throw new Error("Defesa salva, mas a resposta veio sem ID. Recarregue a lista de defesas.");
           location.href = `/defenses/${data.id}`;
         } catch (error) {
           showMessage(error.message || "Erro ao salvar defesa.", true);
