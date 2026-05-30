@@ -584,7 +584,7 @@
         try {
           const query = new URLSearchParams({ name: queryText.trim(), page_size: "50" });
           const response = await fetch(`/api/monster-search?${query}`);
-          const data = await response.json();
+          const data = await readJsonResponse(response, "Erro ao buscar monstro. Tente novamente.");
           if (!response.ok) throw new Error(data.detail || "Erro ao buscar monstro");
           renderMonsterResults(id, data.results || []);
         } catch (error) {
@@ -598,7 +598,7 @@
           const query = new URLSearchParams({ name, page_size: "10" });
           const response = await fetch(`/api/monster-search?${query}`);
           if (!response.ok) throw new Error("Erro ao buscar monstro");
-          const data = await response.json();
+          const data = await readJsonResponse(response, "Erro ao buscar monstro. Tente novamente.");
           return (data.results || []).find((item) => item.name?.toLowerCase() === name.toLowerCase())
             || (data.results || [])[0]
             || { name, image_filename: "", element: "fire" };
@@ -622,7 +622,7 @@
         if (!isEditMode) return;
         try {
           const response = await fetch(`/api/defense-detail?id=${encodeURIComponent(defenseId)}`);
-          const data = await response.json();
+          const data = await readJsonResponse(response, "Erro ao carregar defesa. Tente novamente.");
           if (!response.ok) throw new Error(data.detail || "Erro ao carregar defesa");
           const defense = data.defense;
           setValue("nameInput", defense.name);
