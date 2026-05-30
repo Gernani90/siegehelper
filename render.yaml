@@ -27,10 +27,7 @@ services:
     startCommand: node serve-dist.mjs
     envVars:
       - key: PYTHON_BACKEND_URL
-        fromService:
-          name: siege-helper-api
-          type: web
-          property: hostport
+        value: https://siege-helper-api.onrender.com
       - key: SKIP_INSTALL_DEPS
         value: true
 

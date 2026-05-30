@@ -10,6 +10,8 @@ const rawBackendUrl = (process.env.PYTHON_BACKEND_URL || process.env.BACKEND_URL
   "",
 );
 const backendBaseUrl = /^https?:\/\//i.test(rawBackendUrl) ? rawBackendUrl : `http://${rawBackendUrl}`;
+const publicBackendUrl = (process.env.PUBLIC_BACKEND_URL || "https://siege-helper-api.onrender.com").replace(/\/$/, "");
+const backendUrls = [...new Set([backendBaseUrl, publicBackendUrl].filter(Boolean))];
 
 const contentTypes = {
   ".css": "text/css; charset=utf-8",
@@ -61,14 +63,27 @@ function resolvePath(urlPath) {
   return join(root, "login.html");
 }
 
+async function fetchBackend(pathname, options = {}) {
+  let lastError;
+
+  for (const baseUrl of backendUrls) {
+    try {
+      return await fetch(`${baseUrl}${pathname}`, options);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new Error("Erro ao acessar backend");
+}
+
 createServer((req, res) => {
   const requestPath = (req.url || "/").split("?")[0];
   if (requestPath.startsWith("/api/v1/")) {
-    const targetUrl = `${backendBaseUrl}${req.url || "/"}`;
     const headers = { ...req.headers };
     delete headers.host;
 
-    fetch(targetUrl, {
+    fetchBackend(req.url || "/", {
       method: req.method,
       headers,
       body: req.method === "GET" || req.method === "HEAD" ? undefined : req,
@@ -89,7 +104,7 @@ createServer((req, res) => {
   }
 
   if (requestPath === "/api/defenses-list") {
-    fetch(`${backendBaseUrl}/api/v1/search/defenses?limit=100`)
+    fetchBackend("/api/v1/search/defenses?limit=100")
       .then(async (response) => {
         const body = await response.text();
         res.writeHead(response.status, {
@@ -120,7 +135,7 @@ createServer((req, res) => {
       return;
     }
 
-    fetch(`${backendBaseUrl}/api/v1/search/defense/${id}`)
+    fetchBackend(`/api/v1/search/defense/${id}`)
       .then(async (response) => {
         const body = await response.text();
         res.writeHead(response.status, {
@@ -146,7 +161,7 @@ createServer((req, res) => {
       body += chunk;
     });
     req.on("end", () => {
-      fetch(`${backendBaseUrl}/api/v1/entities/defenses`, {
+      fetchBackend("/api/v1/entities/defenses", {
         method: req.method || "POST",
         headers: { "Content-Type": "application/json" },
         body,
@@ -178,7 +193,7 @@ createServer((req, res) => {
       body += chunk;
     });
     req.on("end", () => {
-      fetch(`${backendBaseUrl}/api/v1/entities/defenses/${id}`, {
+      fetchBackend(`/api/v1/entities/defenses/${id}`, {
         method: req.method || "GET",
         headers: { "Content-Type": "application/json" },
         body: body || undefined,
@@ -206,7 +221,7 @@ createServer((req, res) => {
     const url = new URL(req.url || "/", "http://127.0.0.1:3000");
     const name = url.searchParams.get("name") || "";
     const pageSize = url.searchParams.get("page_size") || "10";
-    fetch(`${backendBaseUrl}/api/v1/monsters/search?name=${encodeURIComponent(name)}&page_size=${encodeURIComponent(pageSize)}`)
+    fetchBackend(`/api/v1/monsters/search?name=${encodeURIComponent(name)}&page_size=${encodeURIComponent(pageSize)}`)
       .then(async (response) => {
         const body = await response.text();
         res.writeHead(response.status, {
@@ -237,7 +252,7 @@ createServer((req, res) => {
       return;
     }
 
-    fetch(`${backendBaseUrl}/api/v1/search/attack/${id}`)
+    fetchBackend(`/api/v1/search/attack/${id}`)
       .then(async (response) => {
         const body = await response.text();
         res.writeHead(response.status, {
@@ -263,7 +278,7 @@ createServer((req, res) => {
       body += chunk;
     });
     req.on("end", () => {
-      fetch(`${backendBaseUrl}/api/v1/entities/attacks`, {
+      fetchBackend("/api/v1/entities/attacks", {
         method: req.method || "POST",
         headers: { "Content-Type": "application/json" },
         body,
@@ -295,7 +310,7 @@ createServer((req, res) => {
       body += chunk;
     });
     req.on("end", () => {
-      fetch(`${backendBaseUrl}/api/v1/entities/attacks/${id}`, {
+      fetchBackend(`/api/v1/entities/attacks/${id}`, {
         method: req.method || "GET",
         headers: { "Content-Type": "application/json" },
         body: body || undefined,
