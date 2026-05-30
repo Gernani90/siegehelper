@@ -318,6 +318,15 @@
         white-space: nowrap;
       }
 
+      .leader-note {
+        color: #f4d38a;
+        font-size: 11px;
+        font-weight: 800;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
       .icon-button {
         display: grid;
         width: 32px;
@@ -455,6 +464,36 @@
         gap: 8px;
       }
 
+      .tick-panel {
+        display: grid;
+        gap: 10px;
+        border: 1px solid rgba(102, 125, 154, 0.34);
+        border-radius: 8px;
+        background: rgba(7, 10, 18, 0.36);
+        padding: 12px;
+      }
+
+      .tick-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .tick-result {
+        display: flex;
+        min-height: 40px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border: 1px solid rgba(244, 211, 138, 0.24);
+        border-radius: 8px;
+        background: rgba(216, 173, 95, 0.08);
+        color: #fff3cf;
+        padding: 8px 10px;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
       .stat-input {
         display: grid;
         gap: 5px;
@@ -477,6 +516,7 @@
         .focus-picker { grid-template-columns: 1fr; }
         .rune-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .tick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .button { width: 100%; }
       }
 
@@ -716,7 +756,7 @@
 
           <div class="grid">
             <div class="field">
-              <label for="monster1">Monstro 1</label>
+              <label for="monster1">Monstro 1 - Lider</label>
               <div class="monster-search">
                 <div id="monster1Selected"></div>
                 <input id="monster1" autocomplete="off" placeholder="Buscar monstro..." required />
@@ -875,15 +915,24 @@
         { key: "res", label: "Res %" },
         { key: "acc", label: "Acc %" },
       ];
+      const TICK_TABLE = {"95":{"0":{"7":95,"6":129,"5":176},"24":{"6":106,"5":153},"28":{"6":103,"5":150},"33":{"6":98,"5":145}},"96":{"0":{"7":94,"6":128,"5":175},"24":{"6":105,"5":152,"4":224},"28":{"6":101,"5":148,"4":220},"33":{"6":96,"5":143,"4":215}},"97":{"0":{"7":93,"6":127,"5":174},"24":{"6":104,"5":151,"4":223},"28":{"6":100,"5":147,"4":219},"33":{"6":95,"5":142,"4":214}},"98":{"0":{"7":92,"6":126,"5":173},"24":{"6":102,"5":149,"4":221},"28":{"6":98,"5":145,"4":217},"33":{"6":93,"5":140,"4":212}},"99":{"0":{"7":91,"6":125,"5":172},"19":{"6":106,"5":153,"4":225},"24":{"6":101,"5":148,"4":220},"28":{"6":97,"5":144,"4":216},"33":{"6":92,"5":139,"4":211}},"100":{"0":{"7":90,"6":124,"5":171},"19":{"7":71,"6":105,"5":152},"24":{"6":100,"5":147,"4":219},"28":{"6":96,"5":143,"4":215},"33":{"6":91,"5":138,"4":210}},"101":{"0":{"7":88,"6":122,"5":169},"19":{"6":103,"5":150,"4":222},"24":{"6":98,"5":145,"4":217},"28":{"6":94,"5":141,"4":213},"33":{"6":89,"5":136,"4":208}},"102":{"0":{"7":87,"6":121,"5":168},"19":{"6":102,"5":149,"4":221},"24":{"6":97,"5":144,"4":216},"28":{"6":93,"5":140,"4":212},"33":{"6":88,"5":135,"4":207}},"103":{"0":{"7":86,"6":120,"5":167},"19":{"6":100,"5":147,"4":219},"24":{"6":95,"5":142,"4":214},"28":{"6":91,"5":138,"4":210},"33":{"6":86,"5":133,"4":205}},"104":{"0":{"7":85,"6":119,"5":166},"24":{"6":94,"5":141,"4":213},"28":{"6":90,"5":137,"4":209},"33":{"6":85,"5":132,"4":204}},"105":{"0":{"7":84,"6":118,"5":165},"19":{"6":98,"5":145,"4":217},"24":{"6":93,"5":140,"4":212},"28":{"6":88,"5":135,"4":207},"33":{"6":83,"5":130,"4":202}},"106":{"0":{"7":83,"6":117,"5":164},"19":{"6":96,"5":143,"4":215},"24":{"6":91,"5":138,"4":210},"28":{"6":87,"5":134,"4":206},"30":{"6":85,"5":132,"4":204},"33":{"6":82,"5":129,"4":201}},"107":{"0":{"7":81,"6":115,"5":162},"24":{"6":90,"5":137,"4":209},"28":{"6":85,"5":132,"4":204},"30":{"6":83,"5":130,"4":202},"33":{"6":80,"5":127,"4":199}},"108":{"0":{"7":80,"6":114,"5":161},"19":{"6":94,"5":141,"4":213},"24":{"6":88,"5":135,"4":207},"28":{"6":84,"5":131,"4":203},"33":{"6":79,"5":126,"4":198}},"110":{"0":{"7":78,"6":112,"5":159},"19":{"7":57,"6":91,"5":138,"4":210},"24":{"6":86,"5":133,"4":205},"28":{"6":81,"5":128,"4":200},"33":{"6":76,"5":123,"4":195}},"111":{"0":{"7":77,"6":111,"5":158},"24":{"6":84,"5":131,"4":203},"28":{"6":80,"5":127,"4":199},"33":{"6":74,"5":121,"4":193}},"112":{"0":{"7":76,"6":110,"5":157},"24":{"6":83,"5":130,"4":202},"28":{"6":78,"5":125,"4":197},"33":{"6":73,"5":120,"4":192}},"113":{"0":{"7":75,"6":109,"5":156},"24":{"6":81,"5":128,"4":200},"28":{"6":77,"5":124,"4":196},"33":{"6":71,"5":118,"4":190}},"114":{"0":{"7":73,"6":107,"5":154},"24":{"6":80,"5":127,"4":199},"28":{"6":75,"5":122,"4":194},"33":{"6":70,"5":117,"4":189}},"115":{"0":{"7":72,"6":106,"5":153},"19":{"6":84,"5":131,"4":203},"24":{"6":79,"5":126,"4":198},"28":{"6":74,"5":121,"4":193},"33":{"6":68,"5":115,"4":187}},"116":{"0":{"7":71,"6":105,"5":152},"24":{"6":77,"5":124,"4":196},"28":{"6":73,"5":120,"4":192},"33":{"6":67,"5":114,"4":186}},"117":{"0":{"7":70,"6":104,"5":151},"24":{"6":76,"5":123,"4":195},"28":{"6":71,"5":118,"4":190},"33":{"6":65,"5":112,"4":184}},"118":{"0":{"7":69,"6":103,"5":150},"24":{"6":74,"5":121,"4":193},"28":{"6":70,"5":117,"4":189},"33":{"6":64,"5":111,"4":183}},"119":{"0":{"7":68,"6":102,"5":149},"24":{"6":73,"5":120,"4":192},"28":{"6":68,"5":115,"4":187},"33":{"6":62,"5":109,"4":181}},"120":{"0":{"7":67,"6":101,"5":148},"24":{"6":72,"5":119,"4":191},"28":{"6":67,"5":114,"4":186},"33":{"6":61,"5":108,"4":180}}};
+      const LEADER_OPTIONS = [
+        { value: "0", label: "Sem lider" },
+        { value: "19", label: "19%" },
+        { value: "24", label: "24%" },
+        { value: "28", label: "28%" },
+        { value: "30", label: "30%" },
+        { value: "33", label: "33%" },
+      ];
       const selectedAttackMonsters = {
         monster1: null,
         monster2: null,
         monster3: null,
       };
       const monsterBuildValues = {
-        monster1: { runes: [], stats: {} },
-        monster2: { runes: [], stats: {} },
-        monster3: { runes: [], stats: {} },
+        monster1: { runes: [], stats: {}, tick: { baseSpeed: "", leader: "0", targetTick: "", requiredSpd: "" } },
+        monster2: { runes: [], stats: {}, tick: { baseSpeed: "", leader: "0", targetTick: "", requiredSpd: "" } },
+        monster3: { runes: [], stats: {}, tick: { baseSpeed: "", leader: "0", targetTick: "", requiredSpd: "" } },
       };
       let currentDefense = null;
       let focusOrder = [];
@@ -1071,13 +1120,101 @@
         } else if (typeof build?.stats === "string" && build.stats.trim()) {
           stats.notes = build.stats.trim();
         }
-        return { runes: runeNames, stats };
+        const tick = build?.tick && typeof build.tick === "object" ? {
+          baseSpeed: build.tick.baseSpeed || "",
+          leader: build.tick.leader || "0",
+          targetTick: build.tick.targetTick || "",
+          requiredSpd: build.tick.requiredSpd || build.tick.minSpd || "",
+          minSpd: build.tick.minSpd || build.tick.requiredSpd || "",
+        } : { baseSpeed: "", leader: "0", targetTick: "", requiredSpd: "", minSpd: "" };
+        return { runes: runeNames, stats, tick };
+      }
+
+      function emptyBuild() {
+        return { runes: [], stats: {}, tick: { baseSpeed: "", leader: "0", targetTick: "", requiredSpd: "", minSpd: "" } };
+      }
+
+      function normalizeBaseSpeed(value) {
+        const speed = Number.parseInt(String(value || "").replace(/\D/g, ""), 10);
+        return Number.isFinite(speed) ? String(speed) : "";
+      }
+
+      function tickRows(baseSpeed) {
+        return TICK_TABLE[normalizeBaseSpeed(baseSpeed)] || null;
+      }
+
+      function tickOptions(baseSpeed, leader) {
+        const rows = tickRows(baseSpeed);
+        if (!rows) return {};
+        return rows[leader] || rows["0"] || {};
+      }
+
+      function calculateTick(baseSpeed, leader, targetTick) {
+        const options = tickOptions(baseSpeed, leader);
+        return targetTick && options[targetTick] ? options[targetTick] : "";
+      }
+
+      function leaderSkillText(monster) {
+        const skill = monster?.leader_skill;
+        if (!skill || !skill.attribute || !skill.amount) return "";
+        const area = skill.area && skill.area !== "General" ? ` ${skill.area}` : "";
+        return `Lider: ${skill.attribute} +${skill.amount}%${area}`;
+      }
+
+      function speedLeaderValue(monster = selectedAttackMonsters.monster1) {
+        const skill = monster?.leader_skill;
+        const attribute = String(skill?.attribute || "").toLowerCase();
+        const amount = String(skill?.amount || "");
+        if (!amount || (!attribute.includes("speed") && !attribute.includes("spd"))) return "";
+        return LEADER_OPTIONS.some((option) => option.value === amount) ? amount : "";
+      }
+
+      function applySpeedLeaderToTicks() {
+        const leader = speedLeaderValue();
+        if (!leader) return;
+        ["monster1", "monster2", "monster3"].forEach((id) => {
+          const build = ensureBuild(id);
+          build.tick.leader = leader;
+          build.tick.requiredSpd = String(calculateTick(build.tick.baseSpeed, leader, build.tick.targetTick) || "");
+        });
+      }
+
+      function ensureBuild(id) {
+        if (!monsterBuildValues[id]) monsterBuildValues[id] = emptyBuild();
+        if (!monsterBuildValues[id].tick) monsterBuildValues[id].tick = emptyBuild().tick;
+        return monsterBuildValues[id];
+      }
+
+      function seedBaseSpeed(id, monster) {
+        const speed = normalizeBaseSpeed(monster?.base_speed || monster?.speed);
+        if (!speed) return;
+        const build = ensureBuild(id);
+        if (!build.tick.baseSpeed) build.tick.baseSpeed = speed;
+      }
+
+      function tickPayloadFor(id) {
+        const build = ensureBuild(id);
+        const leader = speedLeaderValue() || "0";
+        const targetTick = String(build.tick.targetTick || "");
+        const minSpd = String(calculateTick(build.tick.baseSpeed, leader, targetTick) || build.tick.minSpd || build.tick.requiredSpd || "");
+        build.tick.leader = leader;
+        build.tick.requiredSpd = minSpd;
+        build.tick.minSpd = minSpd;
+        return build.tick.baseSpeed || targetTick || minSpd
+          ? {
+              baseSpeed: String(build.tick.baseSpeed || "").trim(),
+              leader,
+              targetTick,
+              requiredSpd: minSpd,
+              minSpd,
+            }
+          : null;
       }
 
       function collectMonsterBuilds() {
         return ["monster1", "monster2", "monster3"].map((id, index) => {
           const monsterName = value(id);
-          const build = monsterBuildValues[id] || { runes: [], stats: {} };
+          const build = ensureBuild(id);
           const stats = STAT_OPTIONS
             .map((stat) => ({
               key: stat.key,
@@ -1085,13 +1222,15 @@
               value: String(build.stats?.[stat.key] || "").trim(),
             }))
             .filter((item) => item.value);
+          const tickPayload = tickPayloadFor(id);
           return {
             slot: index + 1,
             monster: monsterName,
             runes: build.runes || [],
             stats,
+            ...(tickPayload ? { tick: tickPayload } : {}),
           };
-        }).filter((item) => item.monster && (item.runes.length || item.stats.length));
+        }).filter((item) => item.monster && (item.runes.length || item.stats.length || item.tick));
       }
 
       function buildRequirementsPayload() {
@@ -1135,12 +1274,18 @@
         }
 
         input.hidden = true;
+        const leaderNote = id === "monster1"
+          ? `<div class="leader-note">${escapeHtml(leaderSkillText(selected) || "Lider sem skill cadastrada")}</div>`
+          : "";
         selectedBox.innerHTML = `
           <div class="selected-monster ${activeBuildId === id ? "active" : ""}" data-edit-build="${id}">
             ${selected.image_filename
               ? `<img src="${IMG_BASE}${escapeHtml(selected.image_filename)}" alt="${escapeHtml(selected.name)}" loading="lazy" />`
               : `<span class="selected-monster-fallback">${escapeHtml(selected.name.slice(0, 1))}</span>`}
-            <div class="selected-monster-name" title="${escapeHtml(selected.name)}">${escapeHtml(selected.name)}</div>
+            <div>
+              <div class="selected-monster-name" title="${escapeHtml(selected.name)}">${escapeHtml(selected.name)}${id === "monster1" ? " - Lider" : ""}</div>
+              ${leaderNote}
+            </div>
             <button class="icon-button" type="button" data-clear-monster="${id}" aria-label="Trocar monstro">×</button>
           </div>
         `;
@@ -1164,9 +1309,26 @@
         ids.forEach(renderSelectedMonster);
 
         const active = selected.find((item) => item.id === activeBuildId);
-        const build = monsterBuildValues[active.id] || { runes: [], stats: {} };
+        const build = ensureBuild(active.id);
         const selectedRuneSummary = build.runes.length ? build.runes.join(" + ") : "Nenhuma runa selecionada";
         const filledStatCount = STAT_OPTIONS.filter((stat) => build.stats?.[stat.key]).length;
+        const tick = build.tick || {};
+        const baseSpeed = normalizeBaseSpeed(tick.baseSpeed || active.monster.base_speed || active.monster.speed);
+        if (baseSpeed && !tick.baseSpeed) tick.baseSpeed = baseSpeed;
+        const leader = speedLeaderValue() || "0";
+        tick.leader = leader;
+        const availableTicks = tickOptions(baseSpeed, leader);
+        const tickKeys = Object.keys(availableTicks).sort((a, b) => Number(a) - Number(b));
+        if (tick.targetTick && !availableTicks[tick.targetTick]) tick.targetTick = "";
+        const targetTick = tick.targetTick || "";
+        const requiredSpd = calculateTick(baseSpeed, leader, targetTick);
+        if (requiredSpd) tick.requiredSpd = String(requiredSpd);
+        if (requiredSpd) tick.minSpd = String(requiredSpd);
+        const tickText = requiredSpd
+          ? `Tick ${targetTick}: +${requiredSpd} SPD`
+          : baseSpeed
+            ? "Selecione lider e tick alvo"
+            : "Informe o SPD base do monstro";
 
         monsterBuilds.innerHTML = `
           <div class="monster-build" data-build-id="${active.id}">
@@ -1214,6 +1376,37 @@
                   `).join("")}
                 </div>
               </div>
+              <div class="tick-panel">
+                <div class="build-label">Tabela de tick</div>
+                <div class="tick-grid">
+                  <div class="stat-input">
+                    <label for="${active.id}BaseSpeed">SPD base</label>
+                    <input id="${active.id}BaseSpeed" inputmode="numeric" data-tick-for="${active.id}" data-tick-key="baseSpeed" value="${escapeHtml(baseSpeed)}" placeholder="Ex: 103" />
+                  </div>
+                  <div class="stat-input">
+                    <label for="${active.id}Leader">Lider speed</label>
+                    <select id="${active.id}Leader" disabled>
+                      ${LEADER_OPTIONS.map((option) => `<option value="${escapeHtml(option.value)}" ${leader === option.value ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div class="stat-input">
+                    <label for="${active.id}TargetTick">Tick alvo</label>
+                    <select id="${active.id}TargetTick" data-tick-for="${active.id}" data-tick-key="targetTick">
+                      <option value="">Selecionar</option>
+                      ${tickKeys.map((key) => `<option value="${escapeHtml(key)}" ${targetTick === key ? "selected" : ""}>Tick ${escapeHtml(key)}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div class="stat-input">
+                    <label for="${active.id}RequiredSpd">SPD necessario</label>
+                    <input id="${active.id}RequiredSpd" value="${escapeHtml(requiredSpd ? `+${requiredSpd}` : "")}" readonly />
+                  </div>
+                </div>
+                <div class="tick-result">
+                  <span>${escapeHtml(tickText)}</span>
+                  <button class="button outline" type="button" data-apply-tick="${active.id}" ${requiredSpd ? "" : "disabled"}>Usar no Speed</button>
+                </div>
+                <div class="hint">Base 95-120 conforme Tabela de Ticks - Ocitocina. O resultado e o bonus de SPD necessario.</div>
+              </div>
             </div>
           </div>
         `;
@@ -1221,7 +1414,7 @@
 
       function clearSelectedMonster(id) {
         selectedAttackMonsters[id] = null;
-        monsterBuildValues[id] = { runes: [], stats: {} };
+        monsterBuildValues[id] = emptyBuild();
         if (activeBuildId === id) {
           activeBuildId = ["monster1", "monster2", "monster3"].find((item) => item !== id && selectedAttackMonsters[item]) || "monster1";
         }
@@ -1234,6 +1427,8 @@
 
       function selectAttackMonster(id, monster) {
         selectedAttackMonsters[id] = monster;
+        seedBaseSpeed(id, monster);
+        if (id === "monster1") applySpeedLeaderToTicks();
         activeBuildId = id;
         const input = document.getElementById(id);
         input.value = monster.name;
@@ -1261,11 +1456,18 @@
             data-monster-name="${escapeHtml(monster.name)}"
             data-monster-image="${escapeHtml(monster.image_filename || "")}"
             data-monster-element="${escapeHtml(monster.element || "")}"
+            data-monster-base-speed="${escapeHtml(monster.base_speed || monster.speed || "")}"
+            data-monster-leader-attribute="${escapeHtml(monster.leader_skill?.attribute || "")}"
+            data-monster-leader-amount="${escapeHtml(monster.leader_skill?.amount || "")}"
+            data-monster-leader-area="${escapeHtml(monster.leader_skill?.area || "")}"
           >
             ${monster.image_filename
               ? `<img src="${IMG_BASE}${escapeHtml(monster.image_filename)}" alt="${escapeHtml(monster.name)}" loading="lazy" />`
               : `<span>${escapeHtml(monster.name.slice(0, 1))}</span>`}
-            <span title="${escapeHtml(monster.name)}">${escapeHtml(monster.name)}</span>
+            <span title="${escapeHtml(monster.name)}">
+              ${escapeHtml(monster.name)}
+              ${id === "monster1" && leaderSkillText(monster) ? `<small class="leader-note">${escapeHtml(leaderSkillText(monster))}</small>` : ""}
+            </span>
           </button>
         `).join("");
       }
@@ -1314,7 +1516,11 @@
           name,
           image_filename: monster.image_filename || "",
           element: monster.element || "",
+          base_speed: monster.base_speed || monster.speed || "",
+          leader_skill: monster.leader_skill || null,
         };
+        seedBaseSpeed(id, selectedAttackMonsters[id]);
+        if (id === "monster1") applySpeedLeaderToTicks();
         document.getElementById(id).value = name;
         renderSelectedMonster(id);
       }
@@ -1378,6 +1584,12 @@
             name: option.dataset.monsterName,
             image_filename: option.dataset.monsterImage,
             element: option.dataset.monsterElement,
+            base_speed: option.dataset.monsterBaseSpeed,
+            leader_skill: option.dataset.monsterLeaderAttribute ? {
+              attribute: option.dataset.monsterLeaderAttribute,
+              amount: Number(option.dataset.monsterLeaderAmount || 0),
+              area: option.dataset.monsterLeaderArea || "",
+            } : null,
           });
           return;
         }
@@ -1410,6 +1622,20 @@
           return;
         }
 
+        const applyTickButton = event.target.closest("[data-apply-tick]");
+        if (applyTickButton) {
+          const id = applyTickButton.dataset.applyTick;
+          const build = ensureBuild(id);
+          const requiredSpd = calculateTick(build.tick.baseSpeed, build.tick.leader || "0", build.tick.targetTick);
+          if (requiredSpd) {
+            build.tick.requiredSpd = String(requiredSpd);
+            build.tick.minSpd = String(requiredSpd);
+            build.stats.spd = String(requiredSpd);
+            renderMonsterBuilds();
+          }
+          return;
+        }
+
         if (!event.target.closest(".monster-search")) {
           closeAllMonsterResults();
         }
@@ -1420,6 +1646,26 @@
         const statKey = event.target.dataset.statKey;
         if (statFor && statKey && monsterBuildValues[statFor]) {
           monsterBuildValues[statFor].stats[statKey] = event.target.value;
+        }
+        const tickFor = event.target.dataset.tickFor;
+        const tickKey = event.target.dataset.tickKey;
+        if (tickFor && tickKey) {
+          const build = ensureBuild(tickFor);
+          build.tick[tickKey] = tickKey === "baseSpeed" ? normalizeBaseSpeed(event.target.value) : event.target.value;
+          build.tick.requiredSpd = String(calculateTick(build.tick.baseSpeed, build.tick.leader || "0", build.tick.targetTick) || "");
+          build.tick.minSpd = build.tick.requiredSpd;
+        }
+      });
+
+      monsterBuilds.addEventListener("change", (event) => {
+        const tickFor = event.target.dataset.tickFor;
+        const tickKey = event.target.dataset.tickKey;
+        if (tickFor && tickKey) {
+          const build = ensureBuild(tickFor);
+          build.tick[tickKey] = event.target.value;
+          build.tick.requiredSpd = String(calculateTick(build.tick.baseSpeed, build.tick.leader || "0", build.tick.targetTick) || "");
+          build.tick.minSpd = build.tick.requiredSpd;
+          renderMonsterBuilds();
         }
       });
 

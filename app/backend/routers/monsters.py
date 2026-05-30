@@ -30,6 +30,8 @@ async def search_monsters(
                         "element": m.get("element"),
                         "natural_stars": m.get("natural_stars"),
                         "awaken_level": m.get("awaken_level"),
+                        "base_speed": m.get("speed") or m.get("base_speed"),
+                        "leader_skill": m.get("leader_skill"),
                     }
                     for m in data.get("results", [])
                     if m.get("awaken_level") == 1 and m.get("obtainable", True) is not False

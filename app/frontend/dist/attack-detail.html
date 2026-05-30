@@ -467,10 +467,22 @@
         return stats || "";
       }
 
+      function formatTick(tick) {
+        if (!tick || typeof tick !== "object") return "";
+        const parts = [];
+        if (tick.baseSpeed) parts.push(`Base SPD ${tick.baseSpeed}`);
+        if (tick.leader && tick.leader !== "0") parts.push(`Leader ${tick.leader}%`);
+        if (tick.targetTick) parts.push(`Tick alvo ${tick.targetTick}`);
+        const minSpd = tick.minSpd || tick.requiredSpd;
+        if (minSpd) parts.push(`SPD minimo +${minSpd}`);
+        return parts.join(" / ");
+      }
+
       async function monsterMarkup(name, build) {
         const imageUrl = await lookupPortrait(name);
         const runesText = formatRunes(build?.runes);
         const statsText = formatStats(build?.stats);
+        const tickText = formatTick(build?.tick);
         return `
           <div class="monster">
             <div class="portrait">
@@ -479,10 +491,11 @@
                 : escapeHtml(name.slice(0, 1))}
             </div>
             <div class="monster-name">${escapeHtml(name)}</div>
-            ${(runesText || statsText) ? `
+            ${(runesText || statsText || tickText) ? `
               <div class="monster-build">
                 ${runesText ? `<div><strong>Runas:</strong> ${escapeHtml(runesText)}</div>` : ""}
                 ${statsText ? `<div><strong>Stats:</strong> ${escapeHtml(statsText)}</div>` : ""}
+                ${tickText ? `<div><strong>Tick:</strong> ${escapeHtml(tickText)}</div>` : ""}
               </div>
             ` : ""}
           </div>
